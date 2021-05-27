@@ -1,0 +1,17 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: quarkus-petclinic-prod
+spec:
+  destination:
+    namespace: cicd-prod
+    name: in-cluster
+  project: default
+  source:
+    path: production
+    repoURL: 'https://github.com/rcarrata/petclinic-config.git'
+    targetRevision: kustomize
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true

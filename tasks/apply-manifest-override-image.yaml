@@ -1,0 +1,36 @@
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: apply-manifests-override-image
+spec:
+  workspaces:
+  - name: source
+  params:
+    - name: image
+      description: Image that will be set in every manifest (if applies)
+      type: string
+    - name: manifest-dir
+      description: The directory in source that contains yaml manifests
+      type: string
+      default: "k8s"
+  steps:
+    - name: override-image
+      image: registry.access.redhat.com/ubi8/ubi:latest
+      workingDir: /workspace/source
+      script: |
+        #!/bin/bash
+        export IMAGE=$(inputs.params.image)
+        export MANIFEST_DIR=$(inputs.params.manifest-dir)
+        echo Override image in manifest $IMAGE
+        ESCAPED_IMAGE=$(printf '%s\n' "$IMAGE" | sed -e 's/[\/&]/\\&/g')
+        sed -i  "s/image: .*/image: ${ESCAPED_IMAGE}/g" $MANIFEST_DIR/*
+        echo -----------------------------------
+    - name: apply
+      image: quay.io/openshift/origin-cli:latest
+      workingDir: /workspace/source
+      command: ["/bin/bash", "-c"]
+      args:
+        - |-
+          echo Applying manifests in $(inputs.params.manifest-dir) directory
+          oc apply -f $(inputs.params.manifest-dir)
+          echo -----------------------------------

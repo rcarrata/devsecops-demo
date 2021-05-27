@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: cicd
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: cicd-dev
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: cicd-stage  
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: cicd-prod

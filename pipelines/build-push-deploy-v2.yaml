@@ -1,0 +1,108 @@
+apiVersion: tekton.dev/v1beta1
+kind: Pipeline
+metadata:
+  name: build-push-deploy-v2
+spec:
+  params:
+    - name: repo-url
+      type: string
+    - name: app-context
+      type: string
+    - name: dockerfile
+      type: string
+    - name: revision
+      type: string
+    - default: 'image-registry.openshift-image-registry.svc.cluster.local:5000'
+      name: image-registry
+      type: string
+    - default: <YOUR_PROJECT>
+      name: image-repository
+      type: string
+  tasks:
+    - name: git-clone
+      params:
+        - name: url
+          value: $(params.repo-url)
+        - name: revision
+          value: $(params.revision)
+        - name: submodules
+          value: 'true'
+        - name: depth
+          value: '1'
+        - name: sslVerify
+          value: 'true'
+        - name: deleteExisting
+          value: 'true'
+        - name: verbose
+          value: 'true'
+      taskRef:
+        kind: ClusterTask
+        name: git-clone
+      workspaces:
+        - name: output
+          workspace: source
+    - name: generate-artifact
+      params:
+        - name: MAVEN_IMAGE
+          value: registry.access.redhat.com/ubi8/openjdk-11:1.3
+        - name: GOALS
+          value:
+            - package
+            - '-f'
+            - $(params.app-context)/pom.xml
+        - name: PROXY_PROTOCOL
+          value: http
+      runAfter:
+        - git-clone
+      taskRef:
+        kind: ClusterTask
+        name: maven
+      workspaces:
+        - name: source
+          workspace: source
+        - name: maven-settings
+          workspace: maven-settings
+    - name: build-and-push-image
+      params:
+        - name: IMAGE
+          value: >-
+            $(params.image-registry)/$(params.image-repository)/$(params.app-context):$(params.revision)
+        - name: BUILDER_IMAGE
+          value: >-
+            registry.redhat.io/rhel8/buildah@sha256:180c4d9849b6ab0e5465d30d4f3a77765cf0d852ca1cb1efb59d6e8c9f90d467
+        - name: STORAGE_DRIVER
+          value: overlay
+        - name: DOCKERFILE
+          value: $(params.dockerfile)
+        - name: CONTEXT
+          value: $(params.app-context)
+        - name: TLSVERIFY
+          value: 'false'
+        - name: FORMAT
+          value: oci
+      runAfter:
+        - generate-artifact
+      taskRef:
+        kind: ClusterTask
+        name: buildah
+      workspaces:
+        - name: source
+          workspace: source
+    - name: apply-manifests-override-image
+      params:
+        - name: image
+          value: >-
+            $(params.image-registry)/$(params.image-repository)/$(params.app-context):$(params.revision)
+        - name: manifest-dir
+          value: $(params.app-context)/k8s
+      runAfter:
+        - build-and-push-image
+      taskRef:
+        kind: Task
+        name: apply-manifests-override-image
+      workspaces:
+        - name: source
+          workspace: source
+  workspaces:
+    - name: source
+    - name: maven-settings
