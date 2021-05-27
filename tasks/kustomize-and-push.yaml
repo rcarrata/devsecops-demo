@@ -1,0 +1,145 @@
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: kustomize-and-push
+spec:
+  workspaces:
+  - name: source
+  - name: config
+  params:
+    - name: image
+      description: Image to be set in all kustomize overlays
+      type: string
+    - name: manifest-dir
+      description: The directory in source that contains yaml manifests
+      type: string
+    - name: git-revision
+      description: git revision to push changes to in config repository
+      type: string
+      default: "master"
+    - name: config-subdirectory
+      description: directory within workspace
+      type: string
+      default: "config"
+  steps:
+    - name: create-kustomize-folders-structure
+      image: quay.io/dsanchor/ubi8-git-kust:0.0.1
+      script: |
+        #!/bin/sh
+        set -eu -o pipefail
+
+        CONFIG_DIR="$(workspaces.config.path)/$(params.config-subdirectory)"
+
+        BASE_CONFIG_DIR="$CONFIG_DIR/base"
+        # Check if base directory exists
+        if [ ! -d "$BASE_CONFIG_DIR" ]
+        then
+          echo "$BASE_CONFIG_DIR does not exists, it will be created"
+          mkdir -p $BASE_CONFIG_DIR
+        else
+          echo "$BASE_CONFIG_DIR already exists, no need to create it"
+        fi
+
+        DEV_CONFIG_DIR="$CONFIG_DIR/development"
+        # Check if development directory exists
+        if [ ! -d "$DEV_CONFIG_DIR" ]
+        then
+          echo "$DEV_CONFIG_DIR does not exists, it will be created"
+          mkdir -p $DEV_CONFIG_DIR
+        else
+          echo "$DEV_CONFIG_DIR already exists, no need to create it"
+        fi
+
+        PROD_CONFIG_DIR="$CONFIG_DIR/production"
+        # Check if production directory exists
+        if [ ! -d "$PROD_CONFIG_DIR" ]
+        then
+          echo "$PROD_CONFIG_DIR does not exists, it will be created"
+          mkdir -p $PROD_CONFIG_DIR
+        else
+          echo "$PROD_CONFIG_DIR already exists, no need to create it"
+        fi
+    - name: copy-app-manifest-to-base
+      image: quay.io/dsanchor/ubi8-git-kust:0.0.1
+      script: |
+        #!/bin/sh
+        set -eu -o pipefail
+
+        CONFIG_DIR="$(workspaces.config.path)/$(params.config-subdirectory)"
+
+        BASE_CONFIG_DIR="$CONFIG_DIR/base"
+
+        rm -rf $BASE_CONFIG_DIR/*
+
+        SOURCES_MANIFEST_DIR="$(workspaces.source.path)/$(params.manifest-dir)"
+       
+        echo "Copying from $SOURCES_MANIFEST_DIR to $BASE_CONFIG_DIR"
+        cp $SOURCES_MANIFEST_DIR/* $BASE_CONFIG_DIR
+        
+    - name: create-or-update-kustomization
+      image: quay.io/dsanchor/ubi8-git-kust:0.0.1
+      script: |
+        #!/bin/sh
+        set -eu -o pipefail
+
+        CONFIG_DIR="$(workspaces.config.path)/$(params.config-subdirectory)"
+
+        BASE_CONFIG_DIR="$CONFIG_DIR/base"
+        pushd $BASE_CONFIG_DIR
+        echo "Creating kustomization file for base directory"
+        kustomize create
+        for file in `ls *yaml | grep -v kustomization`; 
+        do 
+          kustomize edit add resource $file 
+        done
+        popd
+
+        IMAGE=`grep "image:" $BASE_CONFIG_DIR/*.yaml  -h | awk -F: '{print $2}'`
+
+        DEV_CONFIG_DIR="$CONFIG_DIR/development"
+        DEV_KUST_FILE="$DEV_CONFIG_DIR/kustomization.yaml"
+        pushd $DEV_CONFIG_DIR
+        # Check if kustomization.yaml exists
+        if [ ! -f "$DEV_KUST_FILE" ]
+        then
+          echo "$DEV_KUST_FILE does not exists, it will be initialized"
+          kustomize create --resources ../base
+        else 
+          echo "$DEV_KUST_FILE already exists, no need to create it"   
+        fi
+        echo "Update image $IMAGE to $(params.image)"
+        kustomize edit set image $IMAGE=$(params.image) 
+
+        popd
+
+
+        PROD_CONFIG_DIR="$CONFIG_DIR/production"
+        PROD_KUST_FILE="$PROD_CONFIG_DIR/kustomization.yaml"
+        pushd $PROD_CONFIG_DIR
+        # Check if kustomization.yaml exists
+        if [ ! -f "$PROD_KUST_FILE" ]
+        then
+          echo "$PROD_KUST_FILE does not exists, it will be initialized"
+          kustomize create --resources ../base
+        else 
+          echo "$PROD_KUST_FILE already exists, no need to create it"   
+        fi
+        echo "Update image $IMAGE to $(params.image)"
+        kustomize edit set image $IMAGE=$(params.image) 
+
+        popd
+    - name: push-manifest-to-git
+      image: quay.io/dsanchor/ubi8-git-kust:0.0.1
+      script: |
+        #!/bin/sh
+        set -eu -o pipefail
+
+        CONFIG_DIR="$(workspaces.config.path)/$(params.config-subdirectory)"        
+        pushd $CONFIG_DIR
+
+        git config --global user.email "bot@tekton-pipelines.dev"
+        git config --global user.name "tekton-pipelines-bot"
+     
+        git add --a -v 
+        git commit -m "New manifests for application and setting image to $(params.image)"
+        git push origin HEAD:$(params.git-revision)

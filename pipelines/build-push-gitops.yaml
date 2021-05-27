@@ -1,11 +1,14 @@
 apiVersion: tekton.dev/v1beta1
 kind: Pipeline
 metadata:
-  name: build-push-deploy-v2
+  name: build-push-gitops
 spec:
   params:
     - name: repo-url
       type: string
+    - name: source-subdirectory
+      type: string
+      default: 'source'
     - name: app-context
       type: string
     - name: dockerfile
@@ -15,11 +18,18 @@ spec:
     - default: 'image-registry.openshift-image-registry.svc.cluster.local:5000'
       name: image-registry
       type: string
-    - default: <YOUR_PROJECT>
+    - default: <YOUR_PROJECT>      
       name: image-repository
       type: string
+    - name: config-repo-url
+      type: string
+    - name: config-revision
+      type: string
+    - name: config-subdirectory
+      type: string
+      default: 'config'
   tasks:
-    - name: git-clone
+    - name: git-clone-source
       params:
         - name: url
           value: $(params.repo-url)
@@ -35,6 +45,8 @@ spec:
           value: 'true'
         - name: verbose
           value: 'true'
+        - name: subdirectory
+          value: $(params.source-subdirectory)
       taskRef:
         kind: ClusterTask
         name: git-clone
@@ -49,11 +61,11 @@ spec:
           value:
             - package
             - '-f'
-            - $(params.app-context)/pom.xml
+            - $(params.source-subdirectory)/$(params.app-context)/pom.xml
         - name: PROXY_PROTOCOL
           value: http
       runAfter:
-        - git-clone
+        - git-clone-source
       taskRef:
         kind: ClusterTask
         name: maven
@@ -75,7 +87,7 @@ spec:
         - name: DOCKERFILE
           value: $(params.dockerfile)
         - name: CONTEXT
-          value: $(params.app-context)
+          value: $(params.source-subdirectory)/$(params.app-context)
         - name: TLSVERIFY
           value: 'false'
         - name: FORMAT
@@ -88,21 +100,56 @@ spec:
       workspaces:
         - name: source
           workspace: source
-    - name: apply-manifests-override-image
+    - name: git-clone-config
       params:
-        - name: image
-          value: >-
-            $(params.image-registry)/$(params.image-repository)/$(params.app-context):$(params.revision)
-        - name: manifest-dir
-          value: $(params.app-context)/k8s
+        - name: url
+          value: $(params.config-repo-url)
+        - name: revision
+          value: $(params.config-revision)
+        - name: submodules
+          value: 'true'
+        - name: depth
+          value: '1'
+        - name: sslVerify
+          value: 'true'
+        - name: deleteExisting
+          value: 'true'
+        - name: verbose
+          value: 'true'
+        - name: subdirectory
+          value: $(params.config-subdirectory)
       runAfter:
         - build-and-push-image
       taskRef:
-        kind: Task
-        name: apply-manifests-override-image
+        kind: ClusterTask
+        name: git-clone
       workspaces:
+        - name: output
+      # use source workspace to avoid antiaffinity issues with volumes
+          # workspace: config
+          workspace: source
+    - name: kustomize-and-push
+      params:
+        - name: image
+          value:  $(params.image-registry)/$(params.image-repository)/$(params.app-context):$(params.revision)
+        - name: manifest-dir
+          value: $(params.source-subdirectory)/$(params.app-context)/k8s
+        - name: git-revision
+          value: $(params.config-revision)
+        - name: config-subdirectory
+          value: $(params.config-subdirectory)
+      runAfter:
+        - git-clone-config
+      taskRef:
+        kind: Task
+        name: kustomize-and-push
+      workspaces:
+      # use same workspace to avoid antiaffinity issues with volumes
+        - name: config
+          workspace: source
         - name: source
           workspace: source
   workspaces:
     - name: source
     - name: maven-settings
+    # - name: config

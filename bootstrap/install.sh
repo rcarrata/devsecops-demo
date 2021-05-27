@@ -22,3 +22,6 @@ oc apply -k ./ocp-rbac
 
 # Deploy the infra for CICD pipelines
 oc apply -k ./infra-cicd
+
+# Apply the github secret
+ ./add-github-credentials-ask-for-pass.sh cicd rcarratala
