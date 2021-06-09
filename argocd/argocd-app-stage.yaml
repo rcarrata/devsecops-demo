@@ -1,0 +1,17 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: stage-spring-petclinic
+spec:
+  destination:
+    namespace: demo-stage
+    server: https://kubernetes.default.svc
+  project: spring-petclinic
+  source:
+    path: environments/stage
+    repoURL: https://github.com/siamaksade/spring-petclinic-config
+    targetRevision: HEAD
+  # syncPolicy:
+  #   automated:
+  #     prune: true
+  #     selfHeal: true

@@ -1,0 +1,12 @@
+# Configuration secrets for the Central deployment
+central:
+  adminPassword:
+    value: {{ stackrox_central_admin_password }}
+  exposure:
+    route:
+      enabled: true
+
+#Scanner
+
+imagePullSecrets:
+  allowNone: true

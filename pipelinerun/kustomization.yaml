@@ -4,4 +4,4 @@ kind: Kustomization
 namespace: cicd
 
 resources:
-- build-push-deploy-run.yaml
+- pipeline-build-run.yaml
