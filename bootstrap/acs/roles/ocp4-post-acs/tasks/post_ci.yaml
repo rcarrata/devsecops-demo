@@ -1,4 +1,4 @@
-- name: Get central route
+- name: Get ACS central route
   kubernetes.core.k8s_info:
     kind: Route
     api_version: route.openshift.io/v1
@@ -12,7 +12,7 @@
   set_fact:
     f_stackrox_central_addr: "{{ r_stackrox_central_route.resources[0].spec.host }}"
 
-- name: Create API token
+- name: Create API token for access from Pipeline to ACS
   uri:
     url: "https://{{ f_stackrox_central_addr }}/v1/apitokens/generate"
     body: '{"name":"pipelines-ci-token","role":null,"roles":["Continuous Integration"]}'
@@ -28,7 +28,7 @@
   set_fact:
     f_rox_api_token: "{{ r_ci_token_json.json.token }}"
 
-- name: Create secrets for pipelines
+- name: Create ACS API Token secret for using in the pipelines
   kubernetes.core.k8s:
     state: present
     definition:
@@ -41,3 +41,4 @@
         name: roxsecrets
         namespace: "{{ ocp4_demo_pipeline_namespace }}"
       type: Opaque
+  

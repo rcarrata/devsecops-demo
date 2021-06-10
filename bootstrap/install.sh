@@ -14,7 +14,7 @@ info() {
 #### Openshift GitOps + Openshift Pipelines
 # Apply the Openshift GitOps subscription to install the operator
 oc apply -k ./gitops-operator
-sleep 120
+sleep 30
 
 # Apply the proper permissions to the gitops RBAC
 oc apply -k ./gitops-rbac
@@ -48,7 +48,7 @@ oc policy add-role-to-user system:image-puller system:serviceaccount:$prod_prj:d
 # Deploy Nexus, Gogs and Sonar for CICD pipelines
 info "Deploying CI/CD infra to $cicd_prj namespace"
 oc apply -k ./infra-cicd
-sleep 60
+sleep 10
 
 # Initialize the Git Repository in Gogs
 # TODO: Convert them in Kustomize style
@@ -99,9 +99,21 @@ EOF
 oc apply -k ../argocd -n openshift-gitops
 
 # Check if this rbac is still needed
-oc policy add-role-to-user admin system:serviceaccount:openshift-gitops:argocd-argocd-application-controller -n $dev_prj
-oc policy add-role-to-user admin system:serviceaccount:openshift-gitops:argocd-argocd-application-controller -n $stage_prj
+oc policy add-role-to-user admin system:serviceaccount:openshift-gitops:openshift-gitops-argocd-application-controller -n $dev_prj
+oc policy add-role-to-user admin system:serviceaccount:openshift-gitops:openshift-gitops-argocd-application-controller -n $stage_prj
 
 #### Deploy ACS into Openshift
 ansible-playbook acs deploy_only_acs.yaml
 
+PIPELINE_TOKEN=$(oc get secret $(oc get sa pipeline -o jsonpath='{.imagePullSecrets[].name}') -o jsonpath='{.metadata.annotations.openshift\.io\/token-secret\.value}')
+
+#TODO: Automate the creation of the Image Registry Token
+# /main/apidocs#operation/PostImageIntegration
+# Platform Configuration -> Integrations -> Generic Docker Registry -> New Integration 
+
+# Integration Name: OCP Registry
+# Types: Registry
+# Endpoint: image-registry.openshift-image-registry.svc:5000
+# Username: pipeline
+# Password: "TOKEN"
+# Disable TLS Certificate Validation (Insecure): Yes
