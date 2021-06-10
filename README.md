@@ -40,6 +40,7 @@ Using roxctl and ACS API, we integrated in our pipeline several additional secur
 
 <img align="center" width="500" src="docs/pics/pipeline2.png">
 
+10. Kubernetes kustomization files updated with the latest image [commit-sha] in the overlays for dev. This will ensure that our Application are deployed using the specific built image in this pipeline.
 
 ## Continuous Delivery
 
@@ -47,6 +48,13 @@ Argo CD continuously monitor the configurations stored in the Git repository and
 
 <img align="center" width="650" src="docs/pics/pipeline3.png">
 
+9. The ArgoCD applications syncs the manifests in our gogs git repositories, and applies the changes automatically into the namespaces defined:
+
+<img align="center" width="300" src="docs/pics/pipeline5.png">
+
+and deploys every manifest that is defined in the branch/repo of our application:
+
+<img align="center" width="750" src="docs/pics/pipeline6.png">
 
 ## Security Policies and CI Violations
 
