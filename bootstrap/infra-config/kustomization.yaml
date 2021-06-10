@@ -4,6 +4,5 @@ kind: Kustomization
 namespace: cicd
 
 resources:
-- apply-manifest.yaml
-- apply-manifest-override-image.yaml
-- update-image.yaml
+- gogs-configmap.yaml
+- gogs-init-taskrun.yaml
