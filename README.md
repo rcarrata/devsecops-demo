@@ -45,6 +45,9 @@ Using roxctl and ACS API, we integrated in our pipeline several additional secur
 
 Argo CD continuously monitor the configurations stored in the Git repository and uses Kustomize to overlay environment specific configurations when deploying the application to DEV and STAGE environments.
 
+<img align="center" width="650" src="docs/pics/pipeline3.png">
+
+
 ## Security Policies and CI Violations
 
 In this demo, we can control the security policies applied into our pipelines, scanning the images and analysing the different deployments templates used for deploy our applications. 
