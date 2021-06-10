@@ -38,7 +38,7 @@ Using roxctl and ACS API, we integrated in our pipeline several additional secur
 7. Image Check of the build-time violations of the different security policies defined in ACS
 8. Checks build-time and deploy-time violations of security policies in ACS of the YAML deployment files used for deploy our application.
 
-<img align="center" width="650" src="docs/pics/pipeline2.png">
+<img align="center" width="500" src="docs/pics/pipeline2.png">
 
 
 ## Continuous Delivery
