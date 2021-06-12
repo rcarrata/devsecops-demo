@@ -19,7 +19,7 @@ spec:
       description:  Output format (json | csv | pretty)
       default: json
   steps:
-    - name: acs-image-scan
+    - name: rox-image-scan
       image: centos
       env:
         - name: ROX_API_TOKEN

@@ -1,0 +1,187 @@
+apiVersion: tekton.dev/v1beta1
+kind: Pipeline
+metadata:
+  name: petclinic-build-dev
+spec:
+  params:
+    - name: APP_SOURCE_GIT
+      type: string
+      description: The application git repository
+      default: https://github.com/rcarrata/spring-petclinic
+    - name: APP_SOURCE_REVISION
+      type: string
+      description: The application git revision
+      default: master
+    - name: APP_MANIFESTS_GIT
+      type: string
+      description: The application manifests git repository
+      default: https://github.com/rcarrata/spring-petclinic-config
+    - name: APP_IMAGE_TAG
+      type: string
+      default: latest
+      description: The application image tag to build
+  workspaces:
+  - name: workspace
+  - name: maven-settings
+  tasks:
+  - name: source-clone
+    taskRef:
+      name: git-clone
+      kind: ClusterTask
+    workspaces:
+    - name: output
+      workspace: workspace
+    params:
+    - name: url
+      value: $(params.APP_SOURCE_GIT)
+    - name: revision
+      value: $(params.APP_SOURCE_REVISION)
+    - name: depth
+      value: "0"
+    - name: subdirectory
+      value: spring-petclinic
+    - name: deleteExisting
+      value: "true"
+  - name: unit-tests
+    taskRef:
+      name: maven
+    runAfter:
+      - source-clone
+    workspaces:
+    - name: source
+      workspace: workspace
+    - name: maven-settings
+      workspace: maven-settings
+    params:
+    - name: GOALS
+      value: ["package", "-f", "spring-petclinic"]
+  - name: code-analysis
+    taskRef:
+      name: maven
+    runAfter:
+      - source-clone
+    workspaces:
+    - name: source
+      workspace: workspace
+    - name: maven-settings
+      workspace: maven-settings
+    params:
+    - name: GOALS
+      value:
+      - install
+      - sonar:sonar
+      - -f
+      - spring-petclinic
+      - -Dsonar.host.url=http://sonarqube:9000
+      - -Dsonar.userHome=/tmp/sonar
+      - -DskipTests=true
+  - name: release-app
+    taskRef:
+      name: maven
+    runAfter:
+      - code-analysis
+      - unit-tests
+    workspaces:
+    - name: source
+      workspace: workspace
+    - name: maven-settings
+      workspace: maven-settings
+    params:
+    - name: GOALS
+      value:
+      - deploy
+      - -f 
+      - spring-petclinic
+      - -DskipTests=true
+      - -DaltDeploymentRepository=nexus::default::http://nexus:8081/repository/maven-releases/
+      - -DaltSnapshotDeploymentRepository=nexus::default::http://nexus:8081/repository/maven-snapshots/
+  - name: build-image
+    taskRef:
+      name: s2i-java-11
+    runAfter:
+    - release-app
+    params:
+      - name: TLSVERIFY
+        value: "false"
+      - name: MAVEN_MIRROR_URL
+        value: http://nexus:8081/repository/maven-public/
+      - name: PATH_CONTEXT
+        value: spring-petclinic/target
+      - name: IMAGE_NAME
+        value: image-registry.openshift-image-registry.svc:5000/$(context.pipelineRun.namespace)/spring-petclinic
+      - name: IMAGE_TAG
+        value: $(params.APP_IMAGE_TAG)
+    workspaces:
+    - name: source
+      workspace: workspace
+  - name: image-scan
+    runAfter:
+    - build-image
+    taskRef:
+      name: rox-image-scan
+      kind: ClusterTask
+    params:
+    - name: image
+      value: image-registry.openshift-image-registry.svc:5000/$(context.pipelineRun.namespace)/spring-petclinic
+    - name: rox_api_token
+      value: roxsecrets
+    - name: rox_central_endpoint
+      value: roxsecrets
+    - name: output_format
+      value: pretty
+  - name: image-check
+    runAfter:
+    - image-scan
+    taskRef:
+      name: rox-image-check
+      kind: ClusterTask
+    params:
+    - name: image
+      value: image-registry.openshift-image-registry.svc:5000/$(context.pipelineRun.namespace)/spring-petclinic
+    - name: rox_api_token
+      value: roxsecrets
+    - name: rox_central_endpoint
+      value: roxsecrets
+  - name: deploy-check
+    runAfter:
+    - image-check
+    taskRef:
+      name: rox-deployment-check
+      kind: ClusterTask
+    params:
+    - name: GIT_REPOSITORY
+      value: "$(params.APP_MANIFESTS_GIT)"
+    - name: rox_api_token
+      value: roxsecrets
+    - name: rox_central_endpoint
+      value: roxsecrets
+    - name: file
+      value: deployment.yaml
+    - name: deployment_files_path
+      value: app
+    workspaces:
+    - name: workspace
+      workspace: workspace
+  - name: update-deployment
+    runAfter:
+    - deploy-check
+    taskRef:
+      name: git-update-deployment
+    params:
+      - name: GIT_REPOSITORY
+        value: "$(params.APP_MANIFESTS_GIT)"
+      - name: GIT_USERNAME
+        value: gogs
+      - name: GIT_PASSWORD
+        value: gogs
+      - name: CURRENT_IMAGE
+        value: quay.io/siamaksade/spring-petclinic:latest
+      - name: NEW_IMAGE
+        value: image-registry.openshift-image-registry.svc:5000/$(context.pipelineRun.namespace)/spring-petclinic
+      - name: NEW_DIGEST
+        value: "$(tasks.build-image.results.IMAGE_DIGEST)"
+      - name: KUSTOMIZATION_PATH
+        value: environments/dev
+    workspaces:
+    - name: workspace
+      workspace: workspace

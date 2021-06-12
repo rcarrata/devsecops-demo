@@ -1,13 +1,13 @@
 apiVersion: tekton.dev/v1beta1
 kind: Pipeline
 metadata:
-  name: petclinic-build
+  name: petclinic-build-stage
 spec:
   params:
     - name: APP_SOURCE_GIT
       type: string
       description: The application git repository
-      default: https://github.com/siamaksade/spring-petclinic
+      default: https://github.com/rcarrata/spring-petclinic
     - name: APP_SOURCE_REVISION
       type: string
       description: The application git revision
@@ -15,7 +15,7 @@ spec:
     - name: APP_MANIFESTS_GIT
       type: string
       description: The application manifests git repository
-      default: https://github.com/siamaksade/spring-petclinic-config
+      default: https://github.com/rcarrata/spring-petclinic-config
     - name: APP_IMAGE_TAG
       type: string
       default: latest
@@ -181,7 +181,7 @@ spec:
       - name: NEW_DIGEST
         value: "$(tasks.build-image.results.IMAGE_DIGEST)"
       - name: KUSTOMIZATION_PATH
-        value: environments/dev
+        value: environments/stage
     workspaces:
     - name: workspace
       workspace: workspace
