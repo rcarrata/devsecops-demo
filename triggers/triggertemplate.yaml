@@ -25,13 +25,13 @@ spec:
   - apiVersion: tekton.dev/v1beta1
     kind: PipelineRun
     metadata:
-      generateName: petclinic-build-
+      generateName: petclinic-build-dev
       # name: petclinic-dev-$(tt.params.gitbranchname)-$(tt.params.gitshortsha)
       labels:
-        tekton.dev/pipeline: petclinic-build
+        tekton.dev/pipeline: petclinic-build-dev
     spec:
       pipelineRef:
-        name: petclinic-build
+        name: petclinic-build-dev
       params:
         - name: APP_SOURCE_GIT
           value: $(tt.params.gitrepositoryurl)
