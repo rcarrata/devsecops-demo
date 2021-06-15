@@ -1,4 +1,4 @@
-# DevSecOps Pipeline Demo
+# DevSecOps Pipeline Demo 
 
 DevSecOps CICD pipeline demo using several technologies such as:
 
@@ -22,11 +22,10 @@ On every push to the spring-petclinic git repository on Gogs git server, the fol
 
 <img align="center" width="750" src="docs/pics/pipeline1.png">
 
-1. Code is cloned from Gogs git server and the unit-tests are run
-2. Unit tests are executed and in parallel the code is analyzed by SonarQube for anti-patterns
-3. Application is packaged as a JAR and released to Sonatype Nexus snapshot repository
-4. A container image is built in DEV environment using S2I, and pushed to OpenShift internal registry, and tagged with spring-petclinic:[branch]-[commit-sha] and spring-petclinic:latest
-5. Kubernetes manifests and performance tests configurations are cloned from Git repository
+1. [Code is cloned](docs/Steps.md#source-clone) from Gogs git server and the unit-tests are run
+2. [Unit tests](docs/Steps.md#unit-tests) are executed and in parallel the code is [analyzed by Sonarqube](docs/Steps.md#code-analysis-sonarqube) for anti-patterns
+3. Application is packaged as a JAR and [released to Sonatype Nexus](docs/Steps.md#release-app) snapshot repository
+4. A [container image is built](docs/Steps.md#build-image) in DEV environment using S2I, and pushed to OpenShift internal registry, and tagged with spring-petclinic:[branch]-[commit-sha] and spring-petclinic:latest
 
 ## DevSecOps steps using Advanced Cluster Management
 
@@ -34,13 +33,13 @@ Advanced Cluster Management for Kubernetes controls clusters and applications fr
 
 Using roxctl and ACS API, we integrated in our pipeline several additional security steps into our DevSecOps pipeline:
 
-6. Image Scanning using ACS Scanner of the image generated and pushed in step 4.
-7. Image Check of the build-time violations of the different security policies defined in ACS
-8. Checks build-time and deploy-time violations of security policies in ACS of the YAML deployment files used for deploy our application.
+5. [Image Scanning using ACS Scanner](docs/Steps.md#image-scan) of the image generated and pushed in step 4.
+6. [Image Check](docs/Steps.md#image-check) of the build-time violations of the different security policies defined in ACS
+7. [Checks build-time and deploy-time violations](docs/Steps.md#deployment-check) of security policies in ACS of the YAML deployment files used for deploy our application.
 
 <img align="center" width="500" src="docs/pics/pipeline2.png">
 
-10. Kubernetes kustomization files updated with the latest image [commit-sha] in the overlays for dev. This will ensure that our Application are deployed using the specific built image in this pipeline.
+8. Kubernetes kustomization files updated with the latest image [commit-sha] in the overlays for dev. This will ensure that our Application are deployed using the specific built image in this pipeline.
 
 ## Continuous Delivery
 
@@ -81,7 +80,7 @@ cd bootstrap
 bash -x install.sh
 ```
 
-NOTE: this is a working progress, be aware that some parts could not work as expected. PR are welcome :)
+IMPORTANT: this is a working progress, be aware that some parts could not work as expected. PR are welcome :)
 
 ## Credentials
 
@@ -101,3 +100,15 @@ bash -x demo.sh
 # Credits
 
 This repo is heavily based in the [CICD repository](https://github.com/siamaksade/openshift-cicd-demo) and work of Siamak Sadeghianfar. Kudos to Siamak!
+
+# TODO in this Demo Repository
+
+- Improve automation and bootstraping scripts
+- Add documentation about triggers
+- Add better branching with GitHub Flow model
+- Add the Report Repo to upload the tests
+- Add the dependency graphs
+- Integrate Performance Tests (Gatling)
+- Add some compliance report (Openscap? Openshift-compliance Operator?)
+- Add pentesting using [OWASP Zap Proxy](https://www.zaproxy.org/docs/docker/about/)
+- Update images for the infra (nexus, gogs, etc) with the latest versions
