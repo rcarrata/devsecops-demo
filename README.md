@@ -101,7 +101,7 @@ bash -x demo.sh
 
 This repo is heavily based in the [CICD repository](https://github.com/siamaksade/openshift-cicd-demo) and work of Siamak Sadeghianfar. Kudos to Siamak!
 
-# TODO in this Demo Repository
+## TODO
 
 - Improve automation and bootstraping scripts
 - Add documentation about triggers
