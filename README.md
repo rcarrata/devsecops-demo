@@ -22,7 +22,7 @@ On every push to the spring-petclinic git repository on Gogs git server, the fol
 
 <img align="center" width="750" src="docs/pics/pipeline1.png">
 
-1. [Code is cloned](docs/Steps.md) from Gogs git server and the unit-tests are run
+1. [Code is cloned](docs/Steps.md#source-clone) from Gogs git server and the unit-tests are run
 2. Unit tests are executed and in parallel the code is analyzed by SonarQube for anti-patterns
 3. Application is packaged as a JAR and released to Sonatype Nexus snapshot repository
 4. A container image is built in DEV environment using S2I, and pushed to OpenShift internal registry, and tagged with spring-petclinic:[branch]-[commit-sha] and spring-petclinic:latest
