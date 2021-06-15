@@ -1,10 +1,10 @@
-apiVersion: tekton.dev/v1beta1
+apiVersion: tekton.stage/v1beta1
 kind: PipelineRun
 metadata:
-  generateName: petclinic-build-
+  generateName: petclinic-build-stage
 spec:
   pipelineRef:
-    name: petclinic-build
+    name: petclinic-build-stage
   workspaces:
   - name: workspace
     persistentVolumeClaim:
