@@ -101,3 +101,13 @@ bash -x demo.sh
 # Credits
 
 This repo is heavily based in the [CICD repository](https://github.com/siamaksade/openshift-cicd-demo) and work of Siamak Sadeghianfar. Kudos to Siamak!
+
+# TODO in this Demo Repositoy
+
+- Improve automation and bootstraping scripts
+- Add better branching with GitHub Flow model
+- Add the Report Repo to upload the tests
+- Add the dependency graphs
+- Integrate Performance Tests (Gatling)
+- Add some compliance report (Openscap? Openshift-compliance Operator?)
+- Add pentesting using [OWASP Zap Proxy](https://www.zaproxy.org/docs/docker/about/)
