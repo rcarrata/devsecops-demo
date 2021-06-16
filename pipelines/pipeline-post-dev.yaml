@@ -8,6 +8,10 @@ spec:
       type: string
       default: devsecops-dev
       description: The namespace for Stage environments
+    - name: APP_TESTS_GIT
+      type: string
+      description: The application test cases git repository
+      default: https://github.com/rcarrata/spring-petclinic-gatling
   workspaces:
   - name: workspace
   - name: maven-settings
@@ -21,3 +25,31 @@ spec:
     workspaces:
     - name: workspace
       workspace: workspace
+  - name: perf-tests-clone
+    taskRef:
+      name: git-clone
+      kind: ClusterTask
+    workspaces:
+    - name: output
+      workspace: workspace
+    runAfter:
+      - pentesting-test
+    params:
+    - name: url
+      value: $(params.APP_TESTS_GIT)
+    - name: subdirectory
+      value: spring-petclinic-gatling
+    - name: deleteExisting
+      value: "true"
+  - name: performance-test
+    taskRef:
+      name: gatling
+    runAfter:
+      - perf-tests-clone
+    params:
+      - name: APP_URL
+        value: "http://spring-petclinic.$(params.DEV_NAMESPACE).svc.cluster.local:8080"
+    workspaces:
+    - name: simulations
+      workspace: workspace
+      subPath: spring-petclinic-gatling
