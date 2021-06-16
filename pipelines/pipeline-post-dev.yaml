@@ -1,0 +1,23 @@
+apiVersion: tekton.dev/v1beta1
+kind: Pipeline
+metadata:
+  name: petclinic-post-dev
+spec:
+  params:
+    - name: DEV_NAMESPACE
+      type: string
+      default: devsecops-dev
+      description: The namespace for Stage environments
+  workspaces:
+  - name: workspace
+  - name: maven-settings
+  tasks:
+  - name: pentesting-test
+    taskRef:
+      name: zap-proxy
+    params:
+      - name: APP_URL
+        value: "http://spring-petclinic.$(params.DEV_NAMESPACE).svc.cluster.local:8080"
+    workspaces:
+    - name: workspace
+      workspace: workspace
