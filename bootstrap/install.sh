@@ -54,6 +54,11 @@ info "Deploying CI/CD infra to $cicd_prj namespace"
 oc apply -k ./infra-cicd
 sleep 10
 
+# Config the ArgoCD/Openshift-GitOps Route and credentials
+ARGOPASS=$(oc get secret/openshift-gitops-cluster -n openshift-gitops -o jsonpath='{.data.admin\.password}')
+cat infra-config/argocd-env-secret.yaml | ARGOPASS=$ARGOPASS envsubst | oc create -f - -n $cicd_prj
+oc apply -f infra-config/argocd-env-cm.yaml # The internal openshift gitops route is always the same
+
 # Initialize the Git Repository in Gogs
 # TODO: Convert them in Kustomize style
 info "Initiatlizing git repository in Gogs and configuring webhooks"
@@ -70,7 +75,6 @@ oc apply -f ../tasks -n $cicd_prj
 oc apply -f ../pipelines/pipeline-build-pvc.yaml -n $cicd_prj
 sed "s#https://github.com/rcarrata#http://$GOGS_HOSTNAME/gogs#g" ../pipelines/pipeline-build-dev.yaml | oc apply -f - -n $cicd_prj
 sed "s#https://github.com/rcarrata#http://$GOGS_HOSTNAME/gogs#g" ../pipelines/pipeline-build-stage.yaml | oc apply -f - -n $cicd_prj
-
 
 # Deploy the triggers of Openshift Pipelines and in Gogs
 info "Apply triggers for the pipelines"

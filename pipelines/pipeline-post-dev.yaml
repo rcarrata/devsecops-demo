@@ -16,9 +16,17 @@ spec:
   - name: workspace
   - name: maven-settings
   tasks:
+  - name: wait-application
+    taskRef:
+      name: argocd-task-sync-and-wait
+    params:
+      - name: application-name
+        value: dev-spring-petclinic
   - name: pentesting-test
     taskRef:
       name: zap-proxy
+    runAfter:
+      - wait-application
     params:
       - name: APP_URL
         value: "http://spring-petclinic.$(params.DEV_NAMESPACE).svc.cluster.local:8080"
