@@ -12,6 +12,10 @@ NOTE:
 
 NOTE:
 
+<img align="center" width="750" src="pics/result1_1.png">
+
+NOTE:
+
 ## Code Analysis (Sonarqube)
 
 <img align="center" width="750" src="pics/result2.png">

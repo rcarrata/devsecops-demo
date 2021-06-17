@@ -25,7 +25,7 @@ On every push to the spring-petclinic git repository on Gogs git server, the fol
 <img align="center" width="950" src="docs/pics/pipeline1.png">
 
 0. [Code is cloned](docs/Steps.md#source-clone) from Gogs git server and the unit-tests are run
-1. Dependency report from the source code is generated and uploaded to the report server repository.
+1. [Dependency report](docs/Steps.md#dependency-report) from the source code is generated and uploaded to the report server repository.
 2. [Unit tests](docs/Steps.md#unit-tests) are executed and in parallel the code is [analyzed by Sonarqube](docs/Steps.md#code-analysis-sonarqube) for anti-patterns
 3. Application is packaged as a JAR and [released to Sonatype Nexus](docs/Steps.md#release-app) snapshot repository
 4. A [container image is built](docs/Steps.md#build-image) in DEV environment using S2I, and pushed to OpenShift internal registry, and tagged with spring-petclinic:[branch]-[commit-sha] and spring-petclinic:latest
@@ -64,9 +64,10 @@ and deploys every manifest that is defined in the branch/repo of our application
 
 Once our application is deployed, we need to ensure of our application is stable and performant and also that nobody can hack our application easily. 
 
-10. The performance tests are cloned into our pipeline workspace
-11. The pentesting is executed using the web scanner [OWASP Zap Proxy](https://www.zaproxy.org) using a baseline in order to check the possible vulnerabilities, and a Zap Proxy report is uploaded to the report server repository.
-12. In parallel the performance tests are executed using the load test [Gatling](https://gatling.io/) and a performance report is uploaded to the report server repository.
+10. Our CI in Openshift Pipelines [waits until the ArgoCD app is fully sync](docs/Steps.md#wait-application) and our app and all the resources are deployed 
+11. The [performance tests are cloned(docs/Steps.md#performance-tests-clone)] into our pipeline workspace
+12. The [pentesting is executed](docs/Steps.md#pentesting-tests-using-zap-proxy) using the web scanner [OWASP Zap Proxy](https://www.zaproxy.org) using a baseline in order to check the possible vulnerabilities, and a Zap Proxy report is uploaded to the report server repository.
+13. In parallel the [performance tests are executed](docs/Steps.md#performance-tests-using-gatling) using the load test [Gatling](https://gatling.io/) and a performance report is uploaded to the report server repository.
 
 ## Security Policies and CI Violations
 
@@ -119,9 +120,5 @@ This repo is heavily based in the [CICD repository](https://github.com/siamaksad
 - Improve automation and bootstraping scripts
 - Add documentation about triggers
 - Add better branching with GitHub Flow model
-- Add the Report Repo to upload the tests
-- Add the dependency graphs
-- Integrate Performance Tests (Gatling)
 - Add some compliance report (Openscap? Openshift-compliance Operator?)
-- Add pentesting using [OWASP Zap Proxy](https://www.zaproxy.org/docs/docker/about/)
 - Update images for the infra (nexus, gogs, etc) with the latest versions
