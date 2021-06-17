@@ -20,6 +20,14 @@ spec:
       type: string
       default: latest
       description: The application image tag to build
+    - name: DEV_NAMESPACE
+      type: string
+      default: devsecops-dev
+      description: The namespace for Stage environments
+    - name: APP_TESTS_GIT
+      type: string
+      description: The application test cases git repository
+      default: https://github.com/siamaksade/spring-petclinic-gatling
   workspaces:
   - name: workspace
   - name: maven-settings
@@ -185,3 +193,50 @@ spec:
     workspaces:
     - name: workspace
       workspace: workspace
+  - name: wait-application
+    taskRef:
+      name: argocd-task-sync-and-wait
+    runAfter:
+      - update-deployment
+    params:
+      - name: application-name
+        value: dev-spring-petclinic
+  - name: perf-tests-clone
+    taskRef:
+      name: git-clone
+      kind: ClusterTask
+    workspaces:
+    - name: output
+      workspace: workspace
+    runAfter:
+      - wait-application
+    params:
+    - name: url
+      value: $(params.APP_TESTS_GIT)
+    - name: subdirectory
+      value: spring-petclinic-gatling
+    - name: deleteExisting
+      value: "true"
+  - name: pentesting-test
+    taskRef:
+      name: zap-proxy
+    runAfter:
+      - perf-tests-clone
+    params:
+      - name: APP_URL
+        value: "http://spring-petclinic.$(params.DEV_NAMESPACE).svc.cluster.local:8080"
+    workspaces:
+    - name: workspace
+      workspace: workspace
+  - name: performance-test
+    taskRef:
+      name: gatling
+    runAfter:
+      - perf-tests-clone
+    params:
+      - name: APP_URL
+        value: "http://spring-petclinic.$(params.DEV_NAMESPACE).svc.cluster.local:8080"
+    workspaces:
+    - name: simulations
+      workspace: workspace
+      subPath: spring-petclinic-gatling
