@@ -42,7 +42,7 @@ Using roxctl and ACS API, we integrated in our pipeline several additional secur
 
 <img align="center" width="500" src="docs/pics/pipeline2.png">
 
-8. Kubernetes kustomization files updated with the latest image [commit-sha] in the overlays for dev. This will ensure that our Application are deployed using the specific built image in this pipeline.
+8. Kubernetes [kustomization files updated](docs/Steps.md#update-deployment) with the latest image [commit-sha] in the overlays for dev. This will ensure that our Application are deployed using the specific built image in this pipeline.
 
 NOTE: this 3 steps are executed in parallel for saving time in our DevSecOps pipeline. 
 
@@ -65,7 +65,7 @@ and deploys every manifest that is defined in the branch/repo of our application
 Once our application is deployed, we need to ensure of our application is stable and performant and also that nobody can hack our application easily. 
 
 10. Our CI in Openshift Pipelines [waits until the ArgoCD app is fully sync](docs/Steps.md#wait-application) and our app and all the resources are deployed 
-11. The [performance tests are cloned(docs/Steps.md#performance-tests-clone)] into our pipeline workspace
+11. The [performance tests are cloned(docs/Steps.md#performance-tests-clone) into our pipeline workspace
 12. The [pentesting is executed](docs/Steps.md#pentesting-tests-using-zap-proxy) using the web scanner [OWASP Zap Proxy](https://www.zaproxy.org) using a baseline in order to check the possible vulnerabilities, and a Zap Proxy report is uploaded to the report server repository.
 13. In parallel the [performance tests are executed](docs/Steps.md#performance-tests-using-gatling) using the load test [Gatling](https://gatling.io/) and a performance report is uploaded to the report server repository.
 
