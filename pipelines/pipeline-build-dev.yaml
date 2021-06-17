@@ -83,12 +83,26 @@ spec:
       - -Dsonar.host.url=http://sonarqube:9000
       - -Dsonar.userHome=/tmp/sonar
       - -DskipTests=true
+  - name: dependency-report
+    taskRef:
+      name: dependency-report
+    runAfter:
+      - source-clone
+    workspaces:
+    - name: source
+      workspace: workspace
+    - name: maven-settings
+      workspace: maven-settings
+    params:
+    - name: SOURCE_DIR
+      value: spring-petclinic
   - name: release-app
     taskRef:
       name: maven
     runAfter:
       - code-analysis
       - unit-tests
+      - dependency-report
     workspaces:
     - name: source
       workspace: workspace
@@ -139,7 +153,7 @@ spec:
       value: pretty
   - name: image-check
     runAfter:
-    - image-scan
+    - build-image
     taskRef:
       name: rox-image-check
       kind: ClusterTask
@@ -152,7 +166,7 @@ spec:
       value: roxsecrets
   - name: deploy-check
     runAfter:
-    - image-check
+    - build-image
     taskRef:
       name: rox-deployment-check
       kind: ClusterTask
@@ -172,6 +186,8 @@ spec:
       workspace: workspace
   - name: update-deployment
     runAfter:
+    - image-scan
+    - image-check
     - deploy-check
     taskRef:
       name: git-update-deployment
