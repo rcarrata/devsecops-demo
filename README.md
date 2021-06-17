@@ -16,18 +16,21 @@ DevSecOps CICD pipeline demo using several technologies such as:
 
 - Openshift Cluster 4.7+
 
-## Continuous Integration
+# Overview
+
+## 1. Continuous Integration
 
 On every push to the spring-petclinic git repository on Gogs git server, the following steps are executed within the Tekton pipeline:
 
-<img align="center" width="750" src="docs/pics/pipeline1.png">
+<img align="center" width="950" src="docs/pics/pipeline1.png">
 
-1. [Code is cloned](docs/Steps.md#source-clone) from Gogs git server and the unit-tests are run
+0. [Code is cloned](docs/Steps.md#source-clone) from Gogs git server and the unit-tests are run
+1. [Dependency report](docs/Steps.md#dependency-report) from the source code is generated and uploaded to the report server repository.
 2. [Unit tests](docs/Steps.md#unit-tests) are executed and in parallel the code is [analyzed by Sonarqube](docs/Steps.md#code-analysis-sonarqube) for anti-patterns
 3. Application is packaged as a JAR and [released to Sonatype Nexus](docs/Steps.md#release-app) snapshot repository
 4. A [container image is built](docs/Steps.md#build-image) in DEV environment using S2I, and pushed to OpenShift internal registry, and tagged with spring-petclinic:[branch]-[commit-sha] and spring-petclinic:latest
 
-## DevSecOps steps using Advanced Cluster Management
+## 2. DevSecOps steps using Advanced Cluster Management
 
 Advanced Cluster Management for Kubernetes controls clusters and applications from a single console, with built-in security policies.
 
@@ -39,9 +42,11 @@ Using roxctl and ACS API, we integrated in our pipeline several additional secur
 
 <img align="center" width="500" src="docs/pics/pipeline2.png">
 
-8. Kubernetes kustomization files updated with the latest image [commit-sha] in the overlays for dev. This will ensure that our Application are deployed using the specific built image in this pipeline.
+8. Kubernetes [kustomization files updated](docs/Steps.md#update-deployment) with the latest image [commit-sha] in the overlays for dev. This will ensure that our Application are deployed using the specific built image in this pipeline.
 
-## Continuous Delivery
+NOTE: this 3 steps are executed in parallel for saving time in our DevSecOps pipeline. 
+
+## 3. Continuous Delivery
 
 Argo CD continuously monitor the configurations stored in the Git repository and uses Kustomize to overlay environment specific configurations when deploying the application to DEV and STAGE environments.
 
@@ -54,6 +59,15 @@ Argo CD continuously monitor the configurations stored in the Git repository and
 and deploys every manifest that is defined in the branch/repo of our application:
 
 <img align="center" width="750" src="docs/pics/pipeline6.png">
+
+## 4. PostCI - Pentesting and Performance Tests
+
+Once our application is deployed, we need to ensure of our application is stable and performant and also that nobody can hack our application easily. 
+
+10. Our CI in Openshift Pipelines [waits until the ArgoCD app is fully sync](docs/Steps.md#wait-application) and our app and all the resources are deployed 
+11. The [performance tests are cloned(docs/Steps.md#performance-tests-clone) into our pipeline workspace
+12. The [pentesting is executed](docs/Steps.md#pentesting-tests-using-zap-proxy) using the web scanner [OWASP Zap Proxy](https://www.zaproxy.org) using a baseline in order to check the possible vulnerabilities, and a Zap Proxy report is uploaded to the report server repository.
+13. In parallel the [performance tests are executed](docs/Steps.md#performance-tests-using-gatling) using the load test [Gatling](https://gatling.io/) and a performance report is uploaded to the report server repository.
 
 ## Security Policies and CI Violations
 
@@ -106,9 +120,5 @@ This repo is heavily based in the [CICD repository](https://github.com/siamaksad
 - Improve automation and bootstraping scripts
 - Add documentation about triggers
 - Add better branching with GitHub Flow model
-- Add the Report Repo to upload the tests
-- Add the dependency graphs
-- Integrate Performance Tests (Gatling)
 - Add some compliance report (Openscap? Openshift-compliance Operator?)
-- Add pentesting using [OWASP Zap Proxy](https://www.zaproxy.org/docs/docker/about/)
 - Update images for the infra (nexus, gogs, etc) with the latest versions

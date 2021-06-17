@@ -2,7 +2,17 @@
 
 -
 
-<img align="center" width="750" src="pics/result1.png">
+<img align="center" width="750" src="pics/result0.png">
+
+NOTE:
+
+## Dependency Report 
+
+<img align="center" width="750" src="pics/result2.png">
+
+NOTE:
+
+<img align="center" width="750" src="pics/result1_1.png">
 
 NOTE:
 
@@ -67,9 +77,13 @@ NOTE:
 
 <img align="center" width="750" src="pics/result11.png">
 
+NOTE:
+
 * Non Failing (just Warning)
 
 <img align="center" width="750" src="pics/result12.png">
+
+NOTE:
 
 ## Deployment Check
 
@@ -77,11 +91,48 @@ NOTE:
 
 <img align="center" width="750" src="pics/result13.png">
 
+NOTE:
+
 * Non Failing (just Warning)
 
 <img align="center" width="750" src="pics/result14.png">
+
+NOTE:
 
 ## Update Deployment
 
 <img align="center" width="750" src="pics/result15.png">
 
+NOTE:
+
+## Wait Application
+
+<img align="center" width="750" src="pics/result16.png">
+
+NOTE:
+
+## Performance Tests Clone
+
+<img align="center" width="750" src="pics/result17.png">
+
+NOTE:
+
+## Pentesting Tests using Zap Proxy
+
+<img align="center" width="750" src="pics/result18.png">
+
+NOTE:
+
+<img align="center" width="750" src="pics/result18_1.png">
+
+NOTE:
+
+## Performance Tests using Gatling
+
+<img align="center" width="750" src="pics/result19.png">
+
+NOTE:
+
+<img align="center" width="750" src="pics/result19_1.png">
+
+NOTE:
