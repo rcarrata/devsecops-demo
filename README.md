@@ -53,11 +53,11 @@ NOTE: these 3 steps are executed in parallel for saving time in our DevSecOps pi
 
 Argo CD continuously monitor the configurations stored in the Git repository and uses Kustomize to overlay environment specific configurations when deploying the application to DEV and STAGE environments.
 
-<img align="center" width="650" src="docs/pics/pipeline3.png">
+<img align="center" width="550" src="docs/pics/pipeline3.png">
 
 9. The ArgoCD applications syncs the manifests in our gogs git repositories, and applies the changes automatically into the namespaces defined:
 
-<img align="center" width="300" src="docs/pics/pipeline5.png">
+<img align="center" width="350" src="docs/pics/pipeline5.png">
 
 and deploys every manifest that is defined in the branch/repo of our application:
 
@@ -76,7 +76,7 @@ Once our application is deployed, we need to ensure of our application is stable
 
 ACS can be integrated with several Notifier for notify if certain events happened in the clusters managed. In our case, we integrated with Slack in order to receive notifications when some Policies are violated in order to have more useful information:
 
-<img align="center" width="450" src="docs/pics/result20.png">
+<img align="center" width="400" src="docs/pics/result20.png">
 
 These policies notification can be enabled by each system policy enabled in our system, so you can create your own notification baseline in order to have only the proper information received in your systems.
 
@@ -92,7 +92,7 @@ This Security Policies can be defined at BUILD level (during the build/push of t
 
 For example this Security Policy, checks if a RH Package Manager (dnf,yum) is installed in your Image, and will FAIL the pipeline if detects that the image built contains any RH Package Manager:
 
-<img align="center" width="500" src="docs/pics/pipeline4.png">
+<img align="center" width="470" src="docs/pics/pipeline4.png">
 
 This ensures that we have the total control of our pipelines, and no image is pushed into your registry or deployed in your system that surpases the Security Policies defined.
 

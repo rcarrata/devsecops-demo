@@ -141,8 +141,6 @@ NOTE:
 
 <img align="center" width="750" src="pics/result20_2.png">
 
-
-
 NOTE:
 
 <img align="center" width="750" src="pics/result20.png">
