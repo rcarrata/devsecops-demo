@@ -15,6 +15,9 @@ spec:
     - description: 'Full name of image to scan (example -- gcr.io/rox/sample:5.0-rc1)'
       name: image
       type: string
+    - name: image_digest
+      description:  Digest in sha256 hash format of the image to check
+      type: string
   results:
     - description: Output of `roxctl image check`
       name: check_output
@@ -45,4 +48,4 @@ spec:
         chmod +x ./roxctl  > /dev/null
 
         ./roxctl image check --insecure-skip-tls-verify -e $ROX_CENTRAL_ENDPOINT
-        --image $(params.image) 
+        --image $(params.image)@$(params.image_digest) 
