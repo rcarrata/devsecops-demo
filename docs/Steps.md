@@ -33,7 +33,7 @@ NOTE:
 
 <img align="center" width="750" src="pics/result5.png">
 
-NOTE:
+NOTE: Sometimes there are some random failures that are caused by maven. Rerun the pipeline and check that run OK.
 
 ## Code Analysis
 
@@ -61,11 +61,11 @@ NOTE:
 
 ## Image Scan
 
--
+- 
 
 <img align="center" width="750" src="pics/result9.png">
 
--
+- In the logs of this step is there a direct link to the image scan in ACS. Copy and paste it in another tab in order to get more information about the scanned image.
 
 <img align="center" width="750" src="pics/result10.png">
 

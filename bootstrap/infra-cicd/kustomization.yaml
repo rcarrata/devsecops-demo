@@ -7,3 +7,4 @@ resources:
 - gogs.yaml
 - nexus.yaml
 - sonarqube.yaml
+- reports-repo.yaml
