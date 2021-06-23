@@ -18,6 +18,9 @@ spec:
       type: string
       description:  Output format (json | csv | pretty)
       default: json
+    - name: image_digest
+      description:  Digest in sha256 hash format of the image to scan
+      type: string
   steps:
     - name: rox-image-scan
       image: centos
@@ -38,7 +41,6 @@ spec:
         export NO_COLOR="True"
         curl -k -L -H "Authorization: Bearer $ROX_API_TOKEN" https://$ROX_CENTRAL_ENDPOINT/api/cli/download/roxctl-linux --output ./roxctl  > /dev/null; echo "Getting roxctl" 
         chmod +x ./roxctl > /dev/null
-        ./roxctl image scan --insecure-skip-tls-verify -e $ROX_CENTRAL_ENDPOINT --image $(params.image) --format $(params.output_format) 
-
-## TODO
-## Add the Service account token secret of Pipelines privileges for access the registry as puller
+        echo "## Scanning image $(params.image)@$(params.image_digest)"
+        ./roxctl image scan --insecure-skip-tls-verify -e $ROX_CENTRAL_ENDPOINT --image $(params.image)@$(params.image_digest) --format $(params.output_format) 
+        echo "## Go to https://$ROX_CENTRAL_ENDPOINT/main/vulnerability-management/image/$(params.image_digest) to check more info"

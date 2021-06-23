@@ -2,32 +2,37 @@
 
 DevSecOps CICD pipeline demo using several technologies such as:
 
-- Openshift Pipelines (based in Tekton)
-- Openshift GitOps (based in ArgoCD)
-- Openshift Advanced Cluster Security for Kubernetes (former StackRox)
-- Openshift Container Registry
-- SonarQube
-- Nexus
-- JUnit
-- Gogs 
-- Git Webhook
+- [Openshift Pipelines](https://www.openshift.com/learn/topics/ci-cd)
+- [Openshift GitOps](https://www.openshift.com/blog/announcing-openshift-gitops)
+- [Openshift Advanced Cluster Security for Kubernetes](https://www.redhat.com/en/resources/advanced-cluster-security-for-kubernetes-datasheet)
+- [Openshift Container Registry](https://docs.openshift.com/container-platform/latest/registry/architecture-component-imageregistry.html)
+- [SonarQube](https://www.sonarqube.org/)
+- [Nexus](https://www.sonatype.com/products/repository-oss?topnav=true)
+- [JUnit](https://junit.org/junit5/)
+- [Gogs](https://gogs.io/) 
+- [Git Webhook](https://tekton.dev/docs/triggers/)
+- [Gatling](https://gatling.io/)
+- [Zap Proxy](https://www.zaproxy.org/)
 
 ## Prerequisites 
 
 - Openshift Cluster 4.7+
 
-## Continuous Integration
+# Overview
+
+## 1. Continuous Integration
 
 On every push to the spring-petclinic git repository on Gogs git server, the following steps are executed within the Tekton pipeline:
 
-<img align="center" width="750" src="docs/pics/pipeline1.png">
+<img align="center" width="950" src="docs/pics/pipeline1.png">
 
-1. [Code is cloned](docs/Steps.md#source-clone) from Gogs git server and the unit-tests are run
+0. [Code is cloned](docs/Steps.md#source-clone) from Gogs git server and the unit-tests are run
+1. [Dependency report](docs/Steps.md#dependency-report) from the source code is generated and uploaded to the report server repository.
 2. [Unit tests](docs/Steps.md#unit-tests) are executed and in parallel the code is [analyzed by Sonarqube](docs/Steps.md#code-analysis-sonarqube) for anti-patterns
 3. Application is packaged as a JAR and [released to Sonatype Nexus](docs/Steps.md#release-app) snapshot repository
 4. A [container image is built](docs/Steps.md#build-image) in DEV environment using S2I, and pushed to OpenShift internal registry, and tagged with spring-petclinic:[branch]-[commit-sha] and spring-petclinic:latest
 
-## DevSecOps steps using Advanced Cluster Management
+## 2. DevSecOps steps using Advanced Cluster Management
 
 Advanced Cluster Management for Kubernetes controls clusters and applications from a single console, with built-in security policies.
 
@@ -39,21 +44,43 @@ Using roxctl and ACS API, we integrated in our pipeline several additional secur
 
 <img align="center" width="500" src="docs/pics/pipeline2.png">
 
-8. Kubernetes kustomization files updated with the latest image [commit-sha] in the overlays for dev. This will ensure that our Application are deployed using the specific built image in this pipeline.
+NOTE: these 3 steps are executed in parallel for saving time in our DevSecOps pipeline.
 
-## Continuous Delivery
+8. Kubernetes [kustomization files updated](docs/Steps.md#update-deployment) with the latest image [commit-sha] in the overlays for dev. This will ensure that our Application are deployed using the specific built image in this pipeline.
+
+
+## 3. Continuous Delivery
 
 Argo CD continuously monitor the configurations stored in the Git repository and uses Kustomize to overlay environment specific configurations when deploying the application to DEV and STAGE environments.
 
-<img align="center" width="650" src="docs/pics/pipeline3.png">
+<img align="center" width="550" src="docs/pics/pipeline3.png">
 
 9. The ArgoCD applications syncs the manifests in our gogs git repositories, and applies the changes automatically into the namespaces defined:
 
-<img align="center" width="300" src="docs/pics/pipeline5.png">
+<img align="center" width="350" src="docs/pics/pipeline5.png">
 
 and deploys every manifest that is defined in the branch/repo of our application:
 
 <img align="center" width="750" src="docs/pics/pipeline6.png">
+
+## 4. PostCI - Pentesting and Performance Tests
+
+Once our application is deployed, we need to ensure of our application is stable and performant and also that nobody can hack our application easily. 
+
+10. Our CI in Openshift Pipelines [waits until the ArgoCD app is fully sync](docs/Steps.md#wait-application) and our app and all the resources are deployed 
+11. The [performance tests are cloned](docs/Steps.md#performance-tests-clone) into our pipeline workspace
+12. The [pentesting is executed](docs/Steps.md#pentesting-tests-using-zap-proxy) using the web scanner [OWASP Zap Proxy](https://www.zaproxy.org) using a baseline in order to check the possible vulnerabilities, and a Zap Proxy report is uploaded to the report server repository.
+13. In parallel the [performance tests are executed](docs/Steps.md#performance-tests-using-gatling) using the load test [Gatling](https://gatling.io/) and a performance report is uploaded to the report server repository.
+
+## 5. Notifications
+
+ACS can be integrated with several Notifier for notify if certain events happened in the clusters managed. In our case, we integrated with Slack in order to receive notifications when some Policies are violated in order to have more useful information:
+
+<img align="center" width="400" src="docs/pics/result20.png">
+
+These policies notification can be enabled by each system policy enabled in our system, so you can create your own notification baseline in order to have only the proper information received in your systems.
+
+NOTE: By now the integration is manual. WIP to automate it.
 
 ## Security Policies and CI Violations
 
@@ -65,7 +92,7 @@ This Security Policies can be defined at BUILD level (during the build/push of t
 
 For example this Security Policy, checks if a RH Package Manager (dnf,yum) is installed in your Image, and will FAIL the pipeline if detects that the image built contains any RH Package Manager:
 
-<img align="center" width="500" src="docs/pics/pipeline4.png">
+<img align="center" width="470" src="docs/pics/pipeline4.png">
 
 This ensures that we have the total control of our pipelines, and no image is pushed into your registry or deployed in your system that surpases the Security Policies defined.
 
@@ -89,26 +116,24 @@ IMPORTANT: this is a working progress, be aware that some parts could not work a
 - SonarQube (username/password: admin/admin)
 - Argo CD (username/password: admin/[Login with OAuth using Dex])
 - ACS (username/password: admin/stackrox)
+- Repository Server (username/password: reports/reports)
 
 ## Run the demo!
 
 ```
 cd bootstrap
-bash -x demo.sh
+bash demo.sh
 ```
 
 # Credits
 
 This repo is heavily based in the [CICD repository](https://github.com/siamaksade/openshift-cicd-demo) and work of Siamak Sadeghianfar. Kudos to Siamak!
 
+Big thanks also to [Rodrigo Alvares](https://github.com/ralvares) that helped with their wisdom and knowledge in this demo.
+
 ## TODO
 
 - Improve automation and bootstraping scripts
 - Add documentation about triggers
 - Add better branching with GitHub Flow model
-- Add the Report Repo to upload the tests
-- Add the dependency graphs
-- Integrate Performance Tests (Gatling)
-- Add some compliance report (Openscap? Openshift-compliance Operator?)
-- Add pentesting using [OWASP Zap Proxy](https://www.zaproxy.org/docs/docker/about/)
 - Update images for the infra (nexus, gogs, etc) with the latest versions
