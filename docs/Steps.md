@@ -33,7 +33,7 @@ NOTE:
 
 <img align="center" width="750" src="pics/result5.png">
 
-NOTE:
+NOTE: Sometimes there are some random failures that are caused by maven. Rerun the pipeline and check that run OK.
 
 ## Code Analysis
 

@@ -8,7 +8,7 @@ prod_prj="$PRJ_PREFIX-prod"
 cicd_prj="cicd"
 
 info() {
-    sleep 3
+    sleep 5
     printf "\n# INFO: $@\n"
 }
 
@@ -16,7 +16,7 @@ info() {
 # Apply the Openshift GitOps subscription to install the operator
 info "Install Openshift Pipelines and Openshift GitOps operators"
 oc apply -k ./gitops-operator
-sleep 30
+sleep 50
 
 # Apply the proper permissions to the gitops RBAC
 info "Applying proper RBAC permissions"
@@ -148,3 +148,5 @@ https://$CENTRAL_ROUTE/v1/imageintegrations \
 }
 EOF
 )
+
+info "### DevSecOps demo installed OK. Please go ahead and start it with the demo.sh script"
