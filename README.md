@@ -28,7 +28,7 @@ On every push to the spring-petclinic git repository on Gogs git server, the fol
 
 0. [Code is cloned](docs/Steps.md#source-clone) from Gogs git server and the unit-tests are run
 1. [Dependency report](docs/Steps.md#dependency-report) from the source code is generated and uploaded to the report server repository.
-2. [Unit tests](docs/Steps.md#unit-tests) are executed and in parallel the code is [analyzed by Sonarqube](docs/Steps.md#code-analysis-sonarqube) for anti-patterns
+2. [Unit tests](docs/Steps.md#unit-tests) are executed and in parallel the code is [analyzed by Sonarqube](docs/Steps.md#code-analysis-sonarqube) for anti-patterns.
 3. Application is packaged as a JAR and [released to Sonatype Nexus](docs/Steps.md#release-app) snapshot repository
 4. A [container image is built](docs/Steps.md#build-image) in DEV environment using S2I, and pushed to OpenShift internal registry, and tagged with spring-petclinic:[branch]-[commit-sha] and spring-petclinic:latest
 
@@ -124,6 +124,8 @@ IMPORTANT: this is a working progress, be aware that some parts could not work a
 cd bootstrap
 bash demo.sh
 ```
+
+NOTE: This pipeline will fail if you don't [disable the "Fixable CVSS >= 7"](docs/disable_policy_enforcement.md) policy enforcement behaviour of ACS. This is expected to demonstrate the failure when a violation of the system policy occurs.  
 
 # Credits
 
