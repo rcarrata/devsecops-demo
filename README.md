@@ -39,6 +39,9 @@ Advanced Cluster Management for Kubernetes controls clusters and applications fr
 Using roxctl and ACS API, we integrated in our pipeline several additional security steps into our DevSecOps pipeline:
 
 5. [Image Scanning using ACS Scanner](docs/Steps.md#image-scan) of the image generated and pushed in step 4.
+
+<img align="center" width="750" src="docs/pics/result9_1.png">
+
 6. [Image Check](docs/Steps.md#image-check) of the build-time violations of the different security policies defined in ACS
 7. [Checks build-time and deploy-time violations](docs/Steps.md#deployment-check) of security policies in ACS of the YAML deployment files used for deploy our application.
 
