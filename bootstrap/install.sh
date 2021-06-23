@@ -57,7 +57,7 @@ sleep 10
 # Config the ArgoCD/Openshift-GitOps Route and credentials
 ARGOPASS=$(oc get secret/openshift-gitops-cluster -n openshift-gitops -o jsonpath='{.data.admin\.password}')
 cat infra-config/argocd-env-secret.yaml | ARGOPASS=$ARGOPASS envsubst | oc create -f - -n $cicd_prj
-oc apply -f infra-config/argocd-env-cm.yaml # The internal openshift gitops route is always the same
+oc apply -f infra-config/argocd-env-cm.yaml -n $cicd_prj # The internal openshift gitops route is always the same
 
 # Initialize the Git Repository in Gogs
 # TODO: Convert them in Kustomize style
