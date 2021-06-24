@@ -39,6 +39,9 @@ Advanced Cluster Management for Kubernetes controls clusters and applications fr
 Using roxctl and ACS API, we integrated in our pipeline several additional security steps into our DevSecOps pipeline:
 
 5. [Image Scanning using ACS Scanner](docs/Steps.md#image-scan) of the image generated and pushed in step 4.
+
+<img align="center" width="750" src="docs/pics/result9_1.png">
+
 6. [Image Check](docs/Steps.md#image-check) of the build-time violations of the different security policies defined in ACS
 7. [Checks build-time and deploy-time violations](docs/Steps.md#deployment-check) of security policies in ACS of the YAML deployment files used for deploy our application.
 
@@ -126,6 +129,12 @@ bash demo.sh
 ```
 
 NOTE: This pipeline will fail if you don't [disable the "Fixable CVSS >= 7"](docs/disable_policy_enforcement.md) policy enforcement behaviour of ACS. This is expected to demonstrate the failure when a violation of the system policy occurs.  
+
+## Quick Video with the Demo 
+
+* [Option I - Complete CICD End2End process (Success)](https://youtu.be/uA7nUYchY5Q)
+
+* [Option II - Failure CICD pipeline due to the ACS violation policy](https://youtu.be/jTRImofd6wQ?t=380)
 
 # Credits
 

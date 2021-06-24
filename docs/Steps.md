@@ -1,6 +1,6 @@
 ## Source Clone
 
--
+- Step for cloning the source code using the workspace designed to persist and share the environment within the whole CICD process
 
 <img align="center" width="750" src="pics/result0.png">
 
