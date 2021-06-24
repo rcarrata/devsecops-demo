@@ -130,6 +130,20 @@ bash demo.sh
 
 NOTE: This pipeline will fail if you don't [disable the "Fixable CVSS >= 7"](docs/disable_policy_enforcement.md) policy enforcement behaviour of ACS. This is expected to demonstrate the failure when a violation of the system policy occurs.  
 
+## Quick Video with the Demo 
+
+* Complete CICD End2End process
+
+ifdef::env-github[]
+image:https://static.thenounproject.com/png/196806-200.png[link=https://youtu.be/jTRImofd6wQ?t=380]
+endif::[]
+
+* Failure CICD pipeline due to the ACS violation policy
+
+ifdef::env-github[]
+image:https://static.thenounproject.com/png/196806-200.png[link=https://youtu.be/jTRImofd6wQ?t=380]
+endif::[]
+
 # Credits
 
 This repo is heavily based in the [CICD repository](https://github.com/siamaksade/openshift-cicd-demo) and work of Siamak Sadeghianfar. Kudos to Siamak!
