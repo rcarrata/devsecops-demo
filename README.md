@@ -132,17 +132,9 @@ NOTE: This pipeline will fail if you don't [disable the "Fixable CVSS >= 7"](doc
 
 ## Quick Video with the Demo 
 
-* Complete CICD End2End process
+* [Option I - Complete CICD End2End process (Success)](https://youtu.be/uA7nUYchY5Q)
 
-ifdef::env-github[]
-image:https://static.thenounproject.com/png/196806-200.png[link=https://youtu.be/jTRImofd6wQ?t=380]
-endif::[]
-
-* Failure CICD pipeline due to the ACS violation policy
-
-ifdef::env-github[]
-image:https://static.thenounproject.com/png/196806-200.png[link=https://youtu.be/jTRImofd6wQ?t=380]
-endif::[]
+* [Option II - Failure CICD pipeline due to the ACS violation policy](https://youtu.be/jTRImofd6wQ?t=380)
 
 # Credits
 
