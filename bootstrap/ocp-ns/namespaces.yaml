@@ -11,9 +11,4 @@ metadata:
 apiVersion: v1
 kind: Namespace
 metadata:
-  name: devsecops-qa  
----
-apiVersion: v1
-kind: Namespace
-metadata:
-  name: devsecops-prod
+  name: devsecops-qa

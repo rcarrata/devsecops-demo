@@ -1,38 +1,115 @@
+set -e -u -o pipefail
+declare -r SCRIPT_DIR=$(cd -P $(dirname $0) && pwd)
+declare PRJ_PREFIX="demo"
+declare COMMAND="help"
 
-# Add the tasks into the demo
-printf "\n#### Starting DevSecOps Demo! \n"
-printf "\n## Executing Dev Pipeline... ##\n"
-oc create -f pipelinerun/pipeline-build-dev-run.yaml -n cicd
-OCP_ROUTE=$(oc whoami --show-console)
-printf "$OCP_ROUTE/pipelines/ns/cicd/pipeline-runs"
-printf "\n"
+valid_command() {
+  local fn=$1; shift
+  [[ $(type -t "$fn") == "function" ]]
+}
 
-printf "\n## GOGS Server - Username/Password: gogs/gogs ##\n"
-GOGS=$(oc get route -n cicd gogs -o jsonpath='{.spec.host}')
-printf "https://$GOGS"
-printf "\n"
+info() {
+    printf "\n# INFO: $@\n"
+}
 
-printf "\n## Nexus Server - Username/Password: admin/admin123 ##\n"
-NEXUS=$(oc get route -n cicd nexus -o jsonpath='{.spec.host}')
-printf "https://$NEXUS"
-printf "\n"
+err() {
+  printf "\n# ERROR: $1\n"
+  exit 1
+}
 
-printf "\n## Sonarqube Server - Username/Password: admin/admin ##\n"
-SONARQUBE=$(oc get route -n cicd sonarqube -o jsonpath='{.spec.host}')
-printf "https://$SONARQUBE"
-printf "\n"
 
-printf "\n## Reports Server - Username/Password: reports/reports ##\n"
-REPORTS=$(oc get route -n cicd reports-repo -o jsonpath='{.spec.host}')
-printf "https://$REPORTS"
-printf "\n"
+while (( "$#" )); do
+  case "$1" in
+    start|promote|status)
+      COMMAND=$1
+      shift
+      ;;
+    --)
+      shift
+      break
+      ;;
+    -*|--*)
+      err "Error: Unsupported flag $1"
+      ;;
+    *) 
+      break
+  esac
+done
 
-printf "\n## ACS/Stackrox Server - Username/Password: admin/stackrox ##\n"
-ACS=$(oc get route -n stackrox central -o jsonpath='{.spec.host}')
-printf "https://$ACS"
-printf "\n"
+command.help() {
+  cat <<-EOF
+  Usage:
+      demo [command] [options]
+  
+  Example:
+      demo start
+  
+  COMMANDS:
+      start                          Starts the deploy DEV pipeline
+      promote                        Starts the deploy STAGE pipeline
+      status                         Check the resources available for the demo
+      help                           Help about this command
+EOF
+}
 
-printf "\n## ArgoCD Server - Username/Password: admin/[DEX] ##\n"
-ARGO=$(oc get route -n openshift-gitops openshift-gitops-server -o jsonpath='{.spec.host}')
-printf "https://$ARGO"
-printf "\n"
+command.status() {
+
+    info "## GOGS Server - Username/Password: gogs/gogs ##"
+    GOGS=$(oc get route -n cicd gogs -o jsonpath='{.spec.host}')
+    printf "https://$GOGS"
+    echo ""
+
+    info "## Nexus Server - Username/Password: admin/admin123 ##"
+    NEXUS=$(oc get route -n cicd nexus -o jsonpath='{.spec.host}')
+    printf "https://$NEXUS"
+    echo ""
+
+    info "## Sonarqube Server - Username/Password: admin/admin ##"
+    SONARQUBE=$(oc get route -n cicd sonarqube -o jsonpath='{.spec.host}')
+    printf "https://$SONARQUBE"
+    echo ""
+
+    info "## Reports Server - Username/Password: reports/reports ##"
+    REPORTS=$(oc get route -n cicd reports-repo -o jsonpath='{.spec.host}')
+    printf "https://$REPORTS"
+    echo ""
+
+    info "## ACS/Stackrox Server - Username/Password: admin/stackrox ##"
+    ACS=$(oc get route -n stackrox central -o jsonpath='{.spec.host}')
+    printf "https://$ACS"
+    echo ""
+
+    info "## ArgoCD Server - Username/Password: admin/[DEX] ##"
+    ARGO=$(oc get route -n openshift-gitops openshift-gitops-server -o jsonpath='{.spec.host}')
+    printf "https://$ARGO"
+    echo ""
+}
+
+command.start() {
+    info "## Executing Dev Pipeline... ##"
+    oc create -f pipelinerun/pipeline-build-dev-run.yaml -n cicd
+    OCP_ROUTE=$(oc whoami --show-console)
+    info "Check the pipeline in: \n$OCP_ROUTE/pipelines/ns/cicd/pipeline-runs"
+    echo ""
+}
+
+command.promote() {
+    info "## Executing Stage Pipeline... ##"
+    oc create -f pipelinerun/pipeline-build-stage-run.yaml -n cicd
+    OCP_ROUTE=$(oc whoami --show-console)
+    info "Check the pipeline in: \n$OCP_ROUTE/pipelines/ns/cicd/pipeline-runs"
+    echo ""
+}
+
+main() {
+  local fn="command.$COMMAND"
+  valid_command "$fn" || {
+    err "invalid command '$COMMAND'"
+  }
+
+  cd $SCRIPT_DIR
+  $fn
+  return $?
+}
+
+main

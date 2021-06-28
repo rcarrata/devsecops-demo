@@ -107,12 +107,18 @@ Fully automated deployment and integration of every resource and tool needed for
 
 ```
 cd bootstrap
-bash -x install.sh
+./install.sh
 ```
 
 IMPORTANT: this is a working progress, be aware that some parts could not work as expected. PR are welcome :)
 
-## Credentials
+## Credentials & Resources
+
+Check the resources deployed for this demo with:
+
+```
+./status.sh
+```
 
 - Gogs git server (username/password: gogs/gogs)
 - Sonatype Nexus (username/password: admin/admin123)
@@ -124,8 +130,8 @@ IMPORTANT: this is a working progress, be aware that some parts could not work a
 ## Run the demo!
 
 ```
-cd bootstrap
-bash demo.sh
+cd ..
+./demo.sh start
 ```
 
 NOTE: This pipeline will fail if you don't [disable the "Fixable CVSS >= 7"](docs/disable_policy_enforcement.md) policy enforcement behaviour of ACS. This is expected to demonstrate the failure when a violation of the system policy occurs.  
@@ -135,6 +141,11 @@ NOTE: This pipeline will fail if you don't [disable the "Fixable CVSS >= 7"](doc
 * [Option I - Complete CICD End2End process (Success)](https://youtu.be/uA7nUYchY5Q)
 
 * [Option II - Failure CICD pipeline due to the ACS violation policy](https://youtu.be/jTRImofd6wQ?t=380)
+
+## Promote Pipeline and Triggers
+
+* [Promote Pipeline](docs/promote.md)
+* [Triggers in Dev Pipeline](doc/triggers.md)
 
 # Credits
 
