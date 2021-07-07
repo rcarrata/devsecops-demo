@@ -27,6 +27,7 @@ oc apply -k ./gitops-rbac
 oc wait --for=condition=complete --timeout=600s job/openshift-gitops-crd-wait job/openshift-gitops-crd-wait -n openshift-gitops
 
 # Integrate Dex with Openshift GitOps / ArgoCD
+# FIX: Add role:admin to the dex
 info "Integrate Dex with Openshift GitOps and apply the proper permissions"
 oc patch subscription openshift-gitops-operator -n openshift-operators --type=merge -p='{"spec":{"config":{"env":[{"name":"DISABLE_DEX","Value":"false"}]}}}'
 oc patch argocd openshift-gitops -n openshift-gitops --type=merge -p='{"spec":{"dex":{"openShiftOAuth":true},"rbac":{"defaultPolicy":"role:readonly","policy":"g, system:cluster-admins, role:admin","scopes":"[groups]"}}}'
@@ -41,13 +42,11 @@ oc apply -k ./ocp-ns
 info "Configure service account permissions for pipeline"
 oc policy add-role-to-user edit system:serviceaccount:$cicd_prj:pipeline -n $dev_prj
 oc policy add-role-to-user edit system:serviceaccount:$cicd_prj:pipeline -n $stage_prj
-oc policy add-role-to-user edit system:serviceaccount:$cicd_prj:pipeline -n $prod_prj
 oc policy add-role-to-user system:image-puller system:serviceaccount:$dev_prj:default -n $cicd_prj
 oc policy add-role-to-user system:image-puller system:serviceaccount:$stage_prj:default -n $cicd_prj
-oc policy add-role-to-user system:image-puller system:serviceaccount:$prod_prj:default -n $cicd_prj
 
 # TODO: Finish properly the RBAC
-#oc apply -k ./ocp-rbac 
+#oc apply -k ./ocp-rbac
 
 #### Deploy CICD Infrastructure components
 # Deploy Nexus, Gogs and Sonar for CICD pipelines
@@ -83,7 +82,7 @@ oc apply -f ../triggers -n $cicd_prj
 oc create -f infra-config/gogs-init-taskrun.yaml -n $cicd_prj
 
 #### Deploy Openshift GitOps / ArgoCD resources
-# TODO: 
+# TODO:
 info "Configure Argo CD Projects and Applications"
 cat << EOF > ../argocd/tmp-argocd-app-patch.yaml
 ---
@@ -111,7 +110,7 @@ EOF
 oc apply -k ../argocd -n openshift-gitops
 
 # Check if this rbac is still needed
-info "Check if the RBAC"
+info "Adding RBAC to the GitOps ns"
 oc policy add-role-to-user admin system:serviceaccount:openshift-gitops:openshift-gitops-argocd-application-controller -n $dev_prj
 oc policy add-role-to-user admin system:serviceaccount:openshift-gitops:openshift-gitops-argocd-application-controller -n $stage_prj
 
@@ -119,8 +118,8 @@ oc policy add-role-to-user admin system:serviceaccount:openshift-gitops:openshif
 info "Deploy ACS into Openshift and Apply Security Policies"
 ansible-playbook acs/deploy_only_acs.yaml
 
-#### Create the Registry Integration between ACS and Openshift Internal Registry 
-# TODO: Automate using Ansible 
+#### Create the Registry Integration between ACS and Openshift Internal Registry
+# TODO: Automate using Ansible
 info "Generate the Registry Integration between ACS and Openshift Internal Registry"
 
 # TODO: make this more simpler
@@ -150,5 +149,4 @@ https://$CENTRAL_ROUTE/v1/imageintegrations \
 EOF
 )
 
-
-info "\n### DevSecOps demo installed OK. Please go ahead and start it with the demo.sh script\n"
+info "\n### DevSecOps demo installed OK. Please go ahead and check the status with ./status.sh script\n"
