@@ -17,6 +17,7 @@ DevSecOps CICD pipeline demo using several technologies such as:
 ## Prerequisites 
 
 - Openshift Cluster 4.7+
+- Ansible 2.7+
 
 # Overview
 
