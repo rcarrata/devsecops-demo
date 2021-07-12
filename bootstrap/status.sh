@@ -15,7 +15,7 @@ printf "\n"
 
 printf "\n## Reports Server - Username/Password: reports/reports ##\n"
 REPORTS=$(oc get route -n cicd reports-repo -o jsonpath='{.spec.host}')
-printf "https://$REPORTS"
+printf "http://$REPORTS"
 printf "\n"
 
 printf "\n## ACS/Stackrox Server - Username/Password: admin/stackrox ##\n"
