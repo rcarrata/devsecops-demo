@@ -30,7 +30,7 @@ oc wait --for=condition=complete --timeout=600s job/openshift-gitops-crd-wait jo
 # FIX: Add role:admin to the dex
 info "Integrate Dex with Openshift GitOps and apply the proper permissions"
 oc patch subscription openshift-gitops-operator -n openshift-operators --type=merge -p='{"spec":{"config":{"env":[{"name":"DISABLE_DEX","Value":"false"}]}}}'
-oc patch argocd openshift-gitops -n openshift-gitops --type=merge -p='{"spec":{"dex":{"openShiftOAuth":true},"rbac":{"defaultPolicy":"role:readonly","policy":"g, system:cluster-admins, role:admin","scopes":"[groups]"}}}'
+oc patch argocd openshift-gitops -n openshift-gitops --type=merge -p='{"spec":{"dex":{"openShiftOAuth":true},"rbac":{"defaultPolicy":"role:admin","policy":"g, system:cluster-admins, role:admin","scopes":"[groups]"}}}'
 oc patch argocd openshift-gitops -n openshift-gitops --type=merge -p='{"spec":{"server":{"insecure":true,"route":{"enabled":true,"tls":{"insecureEdgeTerminationPolicy":"Redirect","termination":"edge"}}}}}'
 
 #### Openshift Namespaces and RBAC
