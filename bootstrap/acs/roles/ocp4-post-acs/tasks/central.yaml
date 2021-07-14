@@ -40,6 +40,8 @@
   register: r_stackrox_central_route
   retries: 10
   delay: 20
+  until:
+    - r_stackrox_central_route.resources[0].spec.host is defined
 
 - name: Store central route as a fact
   set_fact:
