@@ -108,7 +108,7 @@ spec:
       containers:
       - name: gogs
         imagePullPolicy: Always
-        image: quay.io/siamaksade/gogs:stable
+        image: quay.io/rcarrata/gogs:stable
         ports:
         - containerPort: 3000
           protocol: TCP
@@ -188,7 +188,7 @@ spec:
   resources:
     requests:
       storage: 1Gi
---- 
+---
 kind: PersistentVolumeClaim
 apiVersion: v1
 metadata:
