@@ -1,5 +1,0 @@
-
-- import_tasks: central.yaml
-- import_tasks: sensor.yaml
-- import_tasks: post_ci.yaml
-- import_tasks: policies.yaml

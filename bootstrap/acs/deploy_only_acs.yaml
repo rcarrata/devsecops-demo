@@ -1,8 +1,0 @@
----
-- name: 'Install the StackRox Central'
-  hosts: localhost
-  connection: local
-  tasks:
-    - name: 'Install the StackRox Central'
-      include_role:
-        name: "ocp4-post-acs"
