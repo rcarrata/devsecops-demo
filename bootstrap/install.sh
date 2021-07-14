@@ -116,7 +116,7 @@ oc policy add-role-to-user admin system:serviceaccount:openshift-gitops:openshif
 
 #### Deploy ACS into Openshift
 info "Deploy ACS into Openshift and Apply Security Policies"
-#ansible-playbook acs/deploy_only_acs.yaml
+ansible-playbook acs/deploy_only_acs.yaml
 
 #### Create the Registry Integration between ACS and Openshift Internal Registry
 # TODO: Automate using Ansible
