@@ -1,6 +1,9 @@
 
 stackrox_central_admin_password: stackrox
 ocp4_demo_pipeline_namespace: cicd
+acs_expected_crds:
+- centrals.platform.stackrox.io
+- securedclusters.platform.stackrox.io
 
 ocp4_workload_stackrox_demo_apps_openshift_policy_fixes:
   - name: "Curl in Image"
