@@ -1,6 +1,6 @@
 # DevSecOps Pipeline Demo
 
-<img align="center" width="950" src="docs/pics/demo-overview.png">
+<img align="center" width="750" src="docs/pics/demo_overview.png">
 
 DevSecOps CICD pipeline demo using several technologies such as:
 
