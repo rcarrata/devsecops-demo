@@ -54,7 +54,6 @@ NOTE: these 3 steps are executed in parallel for saving time in our DevSecOps pi
 
 8. Kubernetes [kustomization files updated](docs/Steps.md#update-deployment) with the latest image [commit-sha] in the overlays for dev. This will ensure that our Application are deployed using the specific built image in this pipeline.
 
-
 ## 3. Continuous Delivery
 
 Argo CD continuously monitor the configurations stored in the Git repository and uses Kustomize to overlay environment specific configurations when deploying the application to DEV and STAGE environments.
