@@ -27,7 +27,7 @@ oc apply -k ./gitops-rbac
 oc wait --for=condition=complete --timeout=600s job/openshift-gitops-crd-wait job/openshift-gitops-crd-wait -n openshift-gitops
 
 # Integrate Dex with Openshift GitOps / ArgoCD
-# FIX: Add role:admin to the dex
+# In 4.8 will be directly with SSO. Not needed.
 info "Integrate Dex with Openshift GitOps and apply the proper permissions"
 oc patch subscription openshift-gitops-operator -n openshift-operators --type=merge -p='{"spec":{"config":{"env":[{"name":"DISABLE_DEX","Value":"false"}]}}}'
 oc patch argocd openshift-gitops -n openshift-gitops --type=merge -p='{"spec":{"dex":{"openShiftOAuth":true},"rbac":{"defaultPolicy":"role:admin","policy":"g, system:cluster-admins, role:admin","scopes":"[groups]"}}}'

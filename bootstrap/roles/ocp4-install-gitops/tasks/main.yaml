@@ -1,2 +1,3 @@
 
-- import_tasks: subs.yaml
+- import_tasks: gitops.yaml
+

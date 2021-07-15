@@ -1,0 +1,12 @@
+## Prerequisites for install CICD Infra
+
+- name: Create Namespaces
+  kubernetes.core.k8s:
+    state: present
+    definition: "{{ lookup('template', 'namespaces.yaml.j2') }}"
+
+- name: Add RoleBinding to the devsecops projects
+  kubernetes.core.k8s:
+    state: present
+    definition: "{{ lookup('template', 'cicd-rb.yaml.j2') }}"
+

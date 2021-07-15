@@ -1,0 +1,40 @@
+- name: Install Gogs
+  kubernetes.core.k8s:
+    state: present
+    definition: "{{ lookup('template', 'gogs.yaml.j2') }}"
+
+- name: Install nexus
+  kubernetes.core.k8s:
+    state: present
+    definition: "{{ lookup('template', 'nexus.yaml.j2') }}"
+
+- name: Install sonarqube
+  kubernetes.core.k8s:
+    state: present
+    definition: "{{ lookup('template', 'sonarqube.yaml.j2') }}"
+
+- name: Install reports repo
+  kubernetes.core.k8s:
+    state: present
+    definition: "{{ lookup('template', 'reports-repo.yaml.j2') }}"
+
+- name: Get gogs route
+  kubernetes.core.k8s_info:
+    kind: Route
+    api_version: route.openshift.io/v1
+    namespace: cicd
+    name: gogs
+  register: r_gogs_route
+  retries: 10
+  delay: 20
+  until:
+    - r_gogs_route.resources[0].spec.host is defined
+
+#- name: wait for gogs postgresql to be running
+#  uri:
+#    url: http://{{ r_gogs_route }}
+#    status_code: 200
+#  register: result
+#  until: result.status == 200
+#  retries: 10
+#  delay: 30
