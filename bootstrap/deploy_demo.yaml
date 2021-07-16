@@ -12,10 +12,6 @@
 #      include_role:
 #        name: "ocp4-post-acs"
 
-    - name: 'Install GitOps'
-      include_role:
-        name: "ocp4-install-gitops"
-
     - name: 'Install CICD Infra'
       include_role:
-        name: "ocp4-install-cicd"
+        name: "ocp4-install-demo"

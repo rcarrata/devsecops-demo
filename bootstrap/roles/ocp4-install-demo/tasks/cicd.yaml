@@ -1,0 +1,128 @@
+- name: Install Gogs
+  kubernetes.core.k8s:
+    state: present
+    definition: "{{ lookup('template', 'gogs.yaml.j2') }}"
+
+- name: Install nexus
+  kubernetes.core.k8s:
+    state: present
+    definition: "{{ lookup('template', 'nexus.yaml.j2') }}"
+
+- name: Install sonarqube
+  kubernetes.core.k8s:
+    state: present
+    definition: "{{ lookup('template', 'sonarqube.yaml.j2') }}"
+
+- name: Install reports repo
+  kubernetes.core.k8s:
+    state: present
+    definition: "{{ lookup('template', 'reports-repo.yaml.j2') }}"
+
+# Check Gogs
+- name: Get gogs route
+  kubernetes.core.k8s_info:
+    kind: Route
+    api_version: route.openshift.io/v1
+    namespace: cicd
+    name: gogs
+  register: r_gogs_route
+  retries: 10
+  delay: 20
+  until:
+    - r_gogs_route.resources[0].spec.host is defined
+
+- name: Debug gogs route
+  debug:
+    msg: "{{ r_gogs_route.resources[0].spec.host }}"
+
+- name: Patch with specific route domain
+  kubernetes.core.k8s:
+    state: present
+    definition: "{{ lookup('template', 'gogs-configmap.yaml.j2') }}"
+
+- name: Wait for gogs and gogs-postgresql to be running
+  uri:
+    url: http://{{ r_gogs_route.resources[0].spec.host }}
+    status_code: 200
+  register: result
+  until: result.status == 200
+  retries: 10
+  delay: 30
+
+# Check Nexus Route
+- name: Get nexus route
+  kubernetes.core.k8s_info:
+    kind: Route
+    api_version: route.openshift.io/v1
+    namespace: cicd
+    name: nexus
+  register: r_nexus_route
+  retries: 10
+  delay: 20
+  until:
+    - r_nexus_route.resources[0].spec.host is defined
+
+- name: Debug nexus route
+  debug:
+    msg: "{{ r_nexus_route.resources[0].spec.host }}"
+
+- name: Wait for nexus to be running
+  uri:
+    url: http://{{ r_nexus_route.resources[0].spec.host }}
+    status_code: 200
+  register: result
+  until: result.status == 200
+  retries: 10
+  delay: 30
+
+# Check Sonarqube Route
+- name: Get sonarqube route
+  kubernetes.core.k8s_info:
+    kind: Route
+    api_version: route.openshift.io/v1
+    namespace: cicd
+    name: sonarqube
+  register: r_sonarqube_route
+  retries: 10
+  delay: 20
+  until:
+    - r_sonarqube_route.resources[0].spec.host is defined
+
+- name: Debug sonarqube route
+  debug:
+    msg: "{{ r_sonarqube_route.resources[0].spec.host }}"
+
+- name: Wait for sonarqube to be running
+  uri:
+    url: https://{{ r_sonarqube_route.resources[0].spec.host }}
+    status_code: 200
+  register: result
+  until: result.status == 200
+  retries: 10
+  delay: 30
+
+# Check Reports Repo Route
+- name: Get reports route
+  kubernetes.core.k8s_info:
+    kind: Route
+    api_version: route.openshift.io/v1
+    namespace: cicd
+    name: reports-repo
+  register: r_reports_route
+  retries: 10
+  delay: 20
+  until:
+    - r_reports_route.resources[0].spec.host is defined
+
+- name: Debug reports route
+  debug:
+    msg: "{{ r_reports_route.resources[0].spec.host }}"
+
+- name: Wait for reports to be running
+  uri:
+    url: http://{{ r_reports_route.resources[0].spec.host }}
+    status_code: 200
+  register: result
+  until: result.status == 200
+  retries: 10
+  delay: 30

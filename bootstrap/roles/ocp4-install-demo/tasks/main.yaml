@@ -1,0 +1,4 @@
+
+#- import_tasks: pre.yaml
+#- import_tasks: gitops.yaml
+- import_tasks: cicd.yaml
