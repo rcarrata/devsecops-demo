@@ -1,22 +1,27 @@
+- name: Add RoleBinding to the devsecops projects
+  kubernetes.core.k8s:
+    state: present
+    definition: "{{ lookup('template', 'cicd-rb.yaml.j2') }}"
+
 - name: Install Gogs
   kubernetes.core.k8s:
     state: present
-    definition: "{{ lookup('template', 'gogs.yaml.j2') }}"
+    definition: "{{ lookup('template', 'cicd-gogs.yaml.j2') }}"
 
 - name: Install nexus
   kubernetes.core.k8s:
     state: present
-    definition: "{{ lookup('template', 'nexus.yaml.j2') }}"
+    definition: "{{ lookup('template', 'cicd-nexus.yaml.j2') }}"
 
 - name: Install sonarqube
   kubernetes.core.k8s:
     state: present
-    definition: "{{ lookup('template', 'sonarqube.yaml.j2') }}"
+    definition: "{{ lookup('template', 'cicd-sonarqube.yaml.j2') }}"
 
 - name: Install reports repo
   kubernetes.core.k8s:
     state: present
-    definition: "{{ lookup('template', 'reports-repo.yaml.j2') }}"
+    definition: "{{ lookup('template', 'cicd-reports-repo.yaml.j2') }}"
 
 # Check Gogs
 - name: Get gogs route
@@ -38,7 +43,7 @@
 - name: Patch with specific route domain
   kubernetes.core.k8s:
     state: present
-    definition: "{{ lookup('template', 'gogs-configmap.yaml.j2') }}"
+    definition: "{{ lookup('template', 'cicd-gogs-configmap.yaml.j2') }}"
 
 - name: Wait for gogs and gogs-postgresql to be running
   uri:

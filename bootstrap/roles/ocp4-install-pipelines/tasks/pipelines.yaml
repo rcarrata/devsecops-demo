@@ -1,0 +1,16 @@
+- name: Create OpenShift Objects for Openshift Pipeline Tasks
+  k8s:
+    state: present
+    definition: "{{ lookup('template', item ) | from_yaml }}"
+  loop:
+  - ./templates/task-argo-sync-and-wait.yaml.j2
+  - ./templates/task-dependency-report.yaml.j2
+  - ./templates/task-gatling.yaml.j2
+  - ./templates/task-git-update-deployment.yaml.j2
+  - ./templates/task-image-scan-task.yaml.j2
+  - ./templates/task-mvn-cm.yaml.j2
+  - ./templates/task-mvn.yaml.j2
+  - ./templates/task-rox-deployment-check.yaml.j2
+  - ./templates/task-rox-image-check.yaml.j2
+  - ./templates/task-s2i-java-11.yaml.j2
+  - ./templates/task-zap-proxy.yaml.j2

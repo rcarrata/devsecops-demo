@@ -1,7 +1,7 @@
 - name: Install GitOps Operator
   kubernetes.core.k8s:
     state: present
-    definition: "{{ lookup('template', 'gitops-subs.yml.j2') }}"
+    definition: "{{ lookup('template', 'subs-gitops.yml.j2') }}"
 
 - name: Wait for GitOps CRD to exist
   k8s_facts:
@@ -17,7 +17,7 @@
 - name: Install OCP Pipelines Operator
   kubernetes.core.k8s:
     state: present
-    definition: "{{ lookup('template', 'pipelines-subs.yml.j2') }}"
+    definition: "{{ lookup('template', 'subs-pipelines.yml.j2') }}"
 
 - name: Wait for GitOps CRD to exist
   k8s_facts:
@@ -33,4 +33,26 @@
 - name: Add ClusterRoleBinding to the openshift-gitops-controller
   kubernetes.core.k8s:
     state: present
-    definition: "{{ lookup('template', 'controller-rb.yml.j2') }}"
+    definition: "{{ lookup('template', 'gitops-rb.yml.j2') }}"
+
+- name: Get argocd password
+  kubernetes.core.k8s_info:
+    kind: Secret
+    api_version: /v1
+    name: openshift-gitops-cluster
+    namespace: openshift-gitops
+  register: r_argopass
+
+#- name: debug
+#  debug:
+#    msg: "{{ r_argopass.resources[0].data['admin.password'] }}"
+
+- name: Add CM for ArgoCD env
+  kubernetes.core.k8s:
+    state: present
+    definition: "{{ lookup('template', 'gitops-env-cm.yaml.j2') }}"
+
+- name: Add Secrets for ArgoCD env
+  kubernetes.core.k8s:
+    state: present
+    definition: "{{ lookup('template', 'gitops-env-secret.yaml.j2') }}"
