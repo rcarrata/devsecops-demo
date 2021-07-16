@@ -3,6 +3,7 @@ apiVersion: triggers.tekton.dev/v1alpha1
 kind: TriggerTemplate
 metadata:
   name: petclinic-trigger-template
+  namespace: cicd
 spec:
   params:
   - name: gitrevision
