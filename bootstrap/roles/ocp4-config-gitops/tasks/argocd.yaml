@@ -1,0 +1,21 @@
+# Check Gogs
+- name: Get gogs route
+  kubernetes.core.k8s_info:
+    kind: Route
+    api_version: route.openshift.io/v1
+    namespace: cicd
+    name: gogs
+  register: r_gogs_route
+  retries: 10
+  delay: 20
+  until:
+    - r_gogs_route.resources[0].spec.host is defined
+
+- name: Create OpenShift Objects for ArgoCD projects
+  k8s:
+    state: present
+    definition: "{{ lookup('template', item ) | from_yaml }}"
+  loop:
+  - ./templates/argocd-petclinic-project.yaml.j2
+  - ./templates/argocd-app-dev.yaml.j2
+  - ./templates/argocd-app-stage.yaml.j2

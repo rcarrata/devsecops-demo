@@ -51,3 +51,8 @@
   - ./templates/pipeline-build-stage.yaml.j2
   - ./templates/pipeline-build-pvc.yaml.j2
 
+# K8s doesn't support the generateName in taskRun
+- name: Add gogs init taskrun for add pipelines
+  shell: oc create -n cicd -f "{{ item }}"
+  loop:
+  - "{{ role_path }}/templates/cicd-gogs-init-taskrun.yaml.j2"

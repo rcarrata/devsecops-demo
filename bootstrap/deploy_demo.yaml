@@ -3,6 +3,23 @@
   hosts: localhost
   connection: local
   tasks:
+
+    - name: 'Install Gitops'
+      include_role:
+        name: "ocp4-install-gitops"
+
+#    - name: 'Install CICD Infra'
+#      include_role:
+#        name: "ocp4-install-cicd"
+
+    - name: 'Install Pipelines'
+      include_role:
+        name: "ocp4-install-pipelines"
+
+    - name: 'Config GitOps'
+      include_role:
+        name: "ocp4-config-gitops"
+
 #    - name: 'Install the ACS Central'
 #      include_role:
 #        name: "ocp4-install-acs"
@@ -11,15 +28,3 @@
 #    - name: 'Install the ACS Post Content'
 #      include_role:
 #        name: "ocp4-post-acs"
-
-#    - name: 'Install Gitops'
-#      include_role:
-#        name: "ocp4-install-gitops"
-
-    - name: 'Install CICD Infra'
-      include_role:
-        name: "ocp4-install-cicd"
-
-    - name: 'Install Pipelines'
-      include_role:
-        name: "ocp4-install-pipelines"

@@ -2,12 +2,13 @@ apiVersion: tekton.dev/v1beta1
 kind: Pipeline
 metadata:
   name: petclinic-build-stage
+  namespace: cicd
 spec:
   params:
     - name: APP_SOURCE_GIT
       type: string
       description: The application git repository
-      default: https://github.com/rcarrata/spring-petclinic
+      default: http://{{ r_gogs_route.resources[0].spec.host }}/gogs/spring-petclinic
     - name: APP_SOURCE_REVISION
       type: string
       description: The application git revision
@@ -15,7 +16,7 @@ spec:
     - name: APP_MANIFESTS_GIT
       type: string
       description: The application manifests git repository
-      default: https://github.com/rcarrata/spring-petclinic-config
+      default: http://{{ r_gogs_route.resources[0].spec.host }}/gogs/spring-petclinic-config
     - name: APP_IMAGE_TAG
       type: string
       default: latest
@@ -27,7 +28,7 @@ spec:
     - name: APP_TESTS_GIT
       type: string
       description: The application test cases git repository
-      default: https://github.com/siamaksade/spring-petclinic-gatling
+      default: https://github.com/rcarrata/spring-petclinic-gatling
   workspaces:
   - name: workspace
   - name: maven-settings
@@ -112,7 +113,7 @@ spec:
     - name: GOALS
       value:
       - deploy
-      - -f 
+      - -f
       - spring-petclinic
       - -DskipTests=true
       - -DaltDeploymentRepository=nexus::default::http://nexus:8081/repository/maven-releases/
