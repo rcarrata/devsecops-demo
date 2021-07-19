@@ -31,7 +31,7 @@ while (( "$#" )); do
     -*|--*)
       err "Error: Unsupported flag $1"
       ;;
-    *) 
+    *)
       break
   esac
 done
@@ -40,10 +40,10 @@ command.help() {
   cat <<-EOF
   Usage:
       demo [command] [options]
-  
+
   Example:
       demo start
-  
+
   COMMANDS:
       start                          Starts the deploy DEV pipeline
       promote                        Starts the deploy STAGE pipeline
@@ -56,7 +56,7 @@ command.status() {
 
     info "## GOGS Server - Username/Password: gogs/gogs ##"
     GOGS=$(oc get route -n cicd gogs -o jsonpath='{.spec.host}')
-    printf "https://$GOGS"
+    printf "http://$GOGS"
     echo ""
 
     info "## Nexus Server - Username/Password: admin/admin123 ##"
