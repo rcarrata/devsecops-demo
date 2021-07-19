@@ -144,6 +144,8 @@ NOTE: This pipeline will fail if you don't [disable the "Fixable CVSS >= 7"](doc
 
 * [Option II - Failure CICD pipeline due to the ACS violation policy](https://youtu.be/jTRImofd6wQ?t=380)
 
+* [Openshift Coffee Break - ACS for Kubernetes - DevSecOps Way](https://youtu.be/43Mr30mXq0I?t=1955)
+
 ## Promote Pipeline and Triggers
 
 * [Promote Pipeline](docs/promote.md)
