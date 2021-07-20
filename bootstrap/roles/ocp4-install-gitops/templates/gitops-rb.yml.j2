@@ -11,30 +11,30 @@ roleRef:
   kind: ClusterRole
   name: admin
 ---
-kind: clusterrolebinding
-apiversion: rbac.authorization.k8s.io/v1
-metadata:
-  name: openshift-gitops-controller-admin
-  namespace: devsecops-dev
-subjects:
-  - kind: serviceaccount
-    name: openshift-gitops-application-controller
-    namespace: openshift-gitops
-roleref:
-  apigroup: rbac.authorization.k8s.io
-  kind: clusterrole
-  name: admin
----
-kind: ClusterRoleBinding
+kind: RoleBinding
 apiVersion: rbac.authorization.k8s.io/v1
 metadata:
   name: openshift-gitops-controller-admin
-  namespace: devsecops-qa
-subjects:
-  - kind: ServiceAccount
-    name: openshift-gitops-application-controller
-    namespace: openshift-gitops
+  namespace: devsecops-dev
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
   name: admin
+subjects:
+- kind: ServiceAccount
+  name: openshift-gitops-argocd-application-controller
+  namespace: openshift-gitops
+---
+kind: RoleBinding
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: openshift-gitops-controller-admin
+  namespace: devsecops-qa
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: admin
+subjects:
+- kind: ServiceAccount
+  name: openshift-gitops-argocd-application-controller
+  namespace: openshift-gitops
