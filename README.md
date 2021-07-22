@@ -109,12 +109,15 @@ This ensures that we have the total control of our pipelines, and no image is pu
 
 * [Install Kubernetes Ansible Module](https://docs.ansible.com/ansible/latest/collections/community/kubernetes/k8s_module.html)
 
+```
+ansible-galaxy collection install community.kubernetes
+```
+
 ## Bootstrap
 
 Fully automated deployment and integration of every resource and tool needed for this demo.
 
 ```
-cd bootstrap
 ./install.sh
 ```
 
