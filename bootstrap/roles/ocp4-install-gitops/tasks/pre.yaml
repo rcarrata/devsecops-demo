@@ -1,0 +1,7 @@
+## Prerequisites for install CICD Infra
+
+- name: Create Namespaces
+  kubernetes.core.k8s:
+    state: present
+    definition: "{{ lookup('template', 'namespaces.yaml.j2') }}"
+

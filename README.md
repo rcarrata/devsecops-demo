@@ -1,4 +1,4 @@
-# DevSecOps Pipeline Demo 
+# DevSecOps Pipeline Demo
 
 DevSecOps CICD pipeline demo using several technologies such as:
 
@@ -9,12 +9,12 @@ DevSecOps CICD pipeline demo using several technologies such as:
 - [SonarQube](https://www.sonarqube.org/)
 - [Nexus](https://www.sonatype.com/products/repository-oss?topnav=true)
 - [JUnit](https://junit.org/junit5/)
-- [Gogs](https://gogs.io/) 
+- [Gogs](https://gogs.io/)
 - [Git Webhook](https://tekton.dev/docs/triggers/)
 - [Gatling](https://gatling.io/)
 - [Zap Proxy](https://www.zaproxy.org/)
 
-## Prerequisites 
+## Prerequisites
 
 - Openshift Cluster 4.7+
 - Ansible 2.7+
@@ -69,9 +69,9 @@ and deploys every manifest that is defined in the branch/repo of our application
 
 ## 4. PostCI - Pentesting and Performance Tests
 
-Once our application is deployed, we need to ensure of our application is stable and performant and also that nobody can hack our application easily. 
+Once our application is deployed, we need to ensure of our application is stable and performant and also that nobody can hack our application easily.
 
-10. Our CI in Openshift Pipelines [waits until the ArgoCD app is fully sync](docs/Steps.md#wait-application) and our app and all the resources are deployed 
+10. Our CI in Openshift Pipelines [waits until the ArgoCD app is fully sync](docs/Steps.md#wait-application) and our app and all the resources are deployed
 11. The [performance tests are cloned](docs/Steps.md#performance-tests-clone) into our pipeline workspace
 12. The [pentesting is executed](docs/Steps.md#pentesting-tests-using-zap-proxy) using the web scanner [OWASP Zap Proxy](https://www.zaproxy.org) using a baseline in order to check the possible vulnerabilities, and a Zap Proxy report is uploaded to the report server repository.
 13. In parallel the [performance tests are executed](docs/Steps.md#performance-tests-using-gatling) using the load test [Gatling](https://gatling.io/) and a performance report is uploaded to the report server repository.
@@ -88,7 +88,7 @@ NOTE: By now the integration is manual. WIP to automate it.
 
 ## Security Policies and CI Violations
 
-In this demo, we can control the security policies applied into our pipelines, scanning the images and analysing the different deployments templates used for deploy our applications. 
+In this demo, we can control the security policies applied into our pipelines, scanning the images and analysing the different deployments templates used for deploy our applications.
 
 We can enforce the different Security Policies in ACS, failing our CI pipelines if a violation of this policy appears in each step of our DevSecOps pipelines (steps 6,7,8).
 
@@ -100,14 +100,19 @@ For example this Security Policy, checks if a RH Package Manager (dnf,yum) is in
 
 This ensures that we have the total control of our pipelines, and no image is pushed into your registry or deployed in your system that surpases the Security Policies defined.
 
-# Deploy 
+# Deploy
+
+## Prerequisites
+
+* [Install Ansible](https://docs.ansible.com/ansible/latest/installation_guide/intro_installation.html#installing-ansible-on-rhel-centos-or-fedora)
+
+* [Install Kubernetes Ansible Module](https://docs.ansible.com/ansible/latest/collections/community/kubernetes/k8s_module.html)
 
 ## Bootstrap
 
 Fully automated deployment and integration of every resource and tool needed for this demo.
 
 ```
-cd bootstrap
 ./install.sh
 ```
 
@@ -135,9 +140,9 @@ cd ..
 ./demo.sh start
 ```
 
-NOTE: This pipeline will fail if you don't [disable the "Fixable CVSS >= 7"](docs/disable_policy_enforcement.md) policy enforcement behaviour of ACS. This is expected to demonstrate the failure when a violation of the system policy occurs.  
+NOTE: This pipeline will fail if you don't [disable the "Fixable CVSS >= 7"](docs/disable_policy_enforcement.md) policy enforcement behaviour of ACS. This is expected to demonstrate the failure when a violation of the system policy occurs.
 
-## Quick Video with the Demo 
+## Quick Video with the Demo
 
 * [Option I - Complete CICD End2End process (Success)](https://youtu.be/uA7nUYchY5Q)
 

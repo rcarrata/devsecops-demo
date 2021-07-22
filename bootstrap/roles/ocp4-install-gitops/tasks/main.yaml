@@ -1,0 +1,3 @@
+
+- import_tasks: pre.yaml
+- import_tasks: gitops.yaml
