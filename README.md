@@ -1,5 +1,7 @@
 # DevSecOps Pipeline Demo
 
+<img align="center" width="750" src="docs/pics/demo_overview.png">
+
 DevSecOps CICD pipeline demo using several technologies such as:
 
 - [Openshift Pipelines](https://www.openshift.com/learn/topics/ci-cd)
