@@ -103,6 +103,12 @@ This ensures that we have the total control of our pipelines, and no image is pu
 
 # Deploy
 
+## Prerequisites
+
+* [Install Ansible](https://docs.ansible.com/ansible/latest/installation_guide/intro_installation.html#installing-ansible-on-rhel-centos-or-fedora)
+
+* [Install Kubernetes Ansible Module](https://docs.ansible.com/ansible/latest/collections/community/kubernetes/k8s_module.html)
+
 ## Bootstrap
 
 Fully automated deployment and integration of every resource and tool needed for this demo.
