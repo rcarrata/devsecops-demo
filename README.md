@@ -123,6 +123,8 @@ Fully automated deployment and integration of every resource and tool needed for
 
 IMPORTANT: this is a working progress, be aware that some parts could not work as expected. PR are welcome :)
 
+NOTE: you want to test the full end2end install using Ansible? Check out the [develop branch](https://github.com/rcarrata/devsecops-demo/tree/develop)!
+
 ## Credentials & Resources
 
 Check the resources deployed for this demo with:
