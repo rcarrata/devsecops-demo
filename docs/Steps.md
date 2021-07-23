@@ -1,12 +1,18 @@
+## Pipelines Resources
+
+The pipelines and tasks are located in this folder:
+
+[Openshift Pipelines](../bootstrap/roles/ocp4-install-pipelines/templates)
+
 ## Source Clone
 
 - Step for cloning the source code using the workspace designed to persist and share the environment within the whole CICD process
 
 <img align="center" width="750" src="pics/result0.png">
 
-NOTE:
 
-## Dependency Report 
+
+## Dependency Report
 
 <img align="center" width="750" src="pics/result2.png">
 
@@ -27,7 +33,7 @@ NOTE:
 NOTE:
 
 
-## Unit Tests 
+## Unit Tests
 
 -
 
@@ -61,7 +67,7 @@ NOTE:
 
 ## Image Scan
 
-- 
+-
 
 <img align="center" width="750" src="pics/result9.png">
 
