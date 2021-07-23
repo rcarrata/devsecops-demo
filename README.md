@@ -160,6 +160,10 @@ NOTE: This pipeline will fail if you don't [disable the "Fixable CVSS >= 7"](doc
 * [Promote Pipeline](docs/promote.md)
 * [Triggers in Dev Pipeline](doc/triggers.md)
 
+## Troubleshooting
+
+* [Check the Tshoot section](docs/tshoot.md)
+
 # Credits
 
 This repo is heavily based in the [CICD repository](https://github.com/siamaksade/openshift-cicd-demo) and work of Siamak Sadeghianfar. Kudos to Siamak!
@@ -168,7 +172,7 @@ Big thanks also to [Rodrigo Alvares](https://github.com/ralvares) that helped wi
 
 ## TODO
 
-- Improve automation and bootstraping scripts
 - Add documentation about triggers
 - Add better branching with GitHub Flow model
 - Update images for the infra (nexus, gogs, etc) with the latest versions
+- Use Nexus Operator
