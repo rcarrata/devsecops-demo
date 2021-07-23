@@ -46,19 +46,19 @@ Check it out!
 
 NOTE: Sometimes there are some random failures that are caused by maven. Rerun the pipeline and check that run OK.
 
-[Link to Task](../bootstrap/roles/ocp4-install-pipelines/templates/task-mvn-yaml.j2)
+[Link to Task](../bootstrap/roles/ocp4-install-pipelines/templates/task-mvn.yaml.j2)
 
 ## Code Analysis
 
 <img align="center" width="750" src="pics/result6.png">
 
-[Link to Task](../bootstrap/roles/ocp4-install-pipelines/templates/task-mvn-yaml.j2)
+[Link to Task](../bootstrap/roles/ocp4-install-pipelines/templates/task-mvn.yaml.j2)
 
 ## Release App
 
 <img align="center" width="750" src="pics/result7.png">
 
-[Link to Task](../bootstrap/roles/ocp4-install-pipelines/templates/task-mvn-yaml.j2)
+[Link to Task](../bootstrap/roles/ocp4-install-pipelines/templates/task-mvn.yaml.j2)
 
 ## Build Image
 
