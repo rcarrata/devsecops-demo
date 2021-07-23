@@ -16,11 +16,6 @@ DevSecOps CICD pipeline demo using several technologies such as:
 - [Gatling](https://gatling.io/)
 - [Zap Proxy](https://www.zaproxy.org/)
 
-## Prerequisites
-
-- Openshift Cluster 4.7+
-- Ansible 2.7+
-
 # Overview
 
 ## 1. Continuous Integration
@@ -105,6 +100,9 @@ This ensures that we have the total control of our pipelines, and no image is pu
 
 ## Prerequisites
 
+- Openshift Cluster 4.7+
+- Ansible 2.7+
+
 * [Install Ansible](https://docs.ansible.com/ansible/latest/installation_guide/intro_installation.html#installing-ansible-on-rhel-centos-or-fedora)
 
 * [Install Kubernetes Ansible Module](https://docs.ansible.com/ansible/latest/collections/community/kubernetes/k8s_module.html)
@@ -162,7 +160,7 @@ NOTE: This pipeline will fail if you don't [disable the "Fixable CVSS >= 7"](doc
 * [Promote Pipeline](docs/promote.md)
 * [Triggers in Dev Pipeline](doc/triggers.md)
 
-## Troubleshooting
+# Troubleshooting
 
 * [Check the Tshoot section](docs/tshoot.md)
 
