@@ -56,7 +56,7 @@ command.status() {
 
     info "## GOGS Server - Username/Password: gogs/gogs ##"
     GOGS=$(oc get route -n cicd gogs -o jsonpath='{.spec.host}')
-    printf "https://$GOGS"
+    printf "http://$GOGS"
     echo ""
 
     info "## Nexus Server - Username/Password: admin/admin123 ##"

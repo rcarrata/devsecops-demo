@@ -16,11 +16,6 @@ DevSecOps CICD pipeline demo using several technologies such as:
 - [Gatling](https://gatling.io/)
 - [Zap Proxy](https://www.zaproxy.org/)
 
-## Prerequisites
-
-- Openshift Cluster 4.7+
-- Ansible 2.7+
-
 # Overview
 
 ## 1. Continuous Integration
@@ -53,7 +48,6 @@ Using roxctl and ACS API, we integrated in our pipeline several additional secur
 NOTE: these 3 steps are executed in parallel for saving time in our DevSecOps pipeline.
 
 8. Kubernetes [kustomization files updated](docs/Steps.md#update-deployment) with the latest image [commit-sha] in the overlays for dev. This will ensure that our Application are deployed using the specific built image in this pipeline.
-
 
 ## 3. Continuous Delivery
 
@@ -106,9 +100,16 @@ This ensures that we have the total control of our pipelines, and no image is pu
 
 ## Prerequisites
 
+- Openshift Cluster 4.7+
+- Ansible 2.7+
+
 * [Install Ansible](https://docs.ansible.com/ansible/latest/installation_guide/intro_installation.html#installing-ansible-on-rhel-centos-or-fedora)
 
 * [Install Kubernetes Ansible Module](https://docs.ansible.com/ansible/latest/collections/community/kubernetes/k8s_module.html)
+
+```
+ansible-galaxy collection install community.kubernetes
+```
 
 ## Bootstrap
 
@@ -119,6 +120,8 @@ Fully automated deployment and integration of every resource and tool needed for
 ```
 
 IMPORTANT: this is a working progress, be aware that some parts could not work as expected. PR are welcome :)
+
+NOTE: you want to test the full end2end install using Ansible? Check out the [develop branch](https://github.com/rcarrata/devsecops-demo/tree/develop)!
 
 ## Credentials & Resources
 
@@ -150,10 +153,16 @@ NOTE: This pipeline will fail if you don't [disable the "Fixable CVSS >= 7"](doc
 
 * [Option II - Failure CICD pipeline due to the ACS violation policy](https://youtu.be/jTRImofd6wQ?t=380)
 
+* [Openshift Coffee Break - ACS for Kubernetes - DevSecOps Way](https://youtu.be/43Mr30mXq0I?t=1955)
+
 ## Promote Pipeline and Triggers
 
 * [Promote Pipeline](docs/promote.md)
 * [Triggers in Dev Pipeline](doc/triggers.md)
+
+# Troubleshooting
+
+* [Check the Tshoot section](docs/tshoot.md)
 
 # Credits
 
@@ -163,7 +172,7 @@ Big thanks also to [Rodrigo Alvares](https://github.com/ralvares) that helped wi
 
 ## TODO
 
-- Improve automation and bootstraping scripts
 - Add documentation about triggers
 - Add better branching with GitHub Flow model
 - Update images for the infra (nexus, gogs, etc) with the latest versions
+- Use Nexus Operator
