@@ -12,6 +12,11 @@
   set_fact:
     f_stackrox_central_addr: "{{ r_stackrox_central_route.resources[0].spec.host }}"
 
+- name: Create ACS Console Link
+  kubernetes.core.k8s:
+    state: present
+    definition: "{{ lookup('template', 'acs-console-link.yml.j2') }}"
+
 - name: Create API token for access from Pipeline to ACS
   uri:
     url: "https://{{ f_stackrox_central_addr }}/v1/apitokens/generate"
@@ -41,23 +46,6 @@
         name: roxsecrets
         namespace: "{{ ocp4_demo_pipeline_namespace }}"
       type: Opaque
-
-## Integrate OCP Registry into ACS for Allow ACS to pull and analyse the image from the OCP Registry
-#- name: Get central route
-#  kubernetes.core.k8s_info:
-#    kind: Route
-#    api_version: route.openshift.io/v1
-#    namespace: stackrox
-#    name: central
-#  register: r_stackrox_central_route
-#  retries: 10
-#  delay: 20
-#  until:
-#    - r_stackrox_central_route.resources[0].spec.host is defined
-#
-#- name: Store central route as a fact
-#  set_fact:
-#    f_stackrox_central_addr: "{{ r_stackrox_central_route.resources[0].spec.host }}"
 
 - name: Get Service Account objects
   kubernetes.core.k8s_info:

@@ -10,13 +10,22 @@
     validate_certs: false
   register: r_stackrox_cluster_init_response
 
-- name: Deploy cluster package
-  kubernetes.core.helm:
-    name: stackrox-secured-cluster-services
-    chart_ref: rhacs/secured-cluster-services
-    release_namespace: stackrox
-    values: "{{ lookup('template', 'templates/cluster.yml.j2')| from_yaml }}"
-    create_namespace: true
+- name: Store cluster init bundle as a fact
+  set_fact:
+    f_stackrox_bundle: "{{ r_stackrox_cluster_init_response.json.kubectlBundle | b64decode }}"
+
+- name: Create init-bundle secrets
+  kubernetes.core.k8s:
+    namespace: stackrox
+    state: present
+    definition: "{{ f_stackrox_bundle }}"
+
+- name: Install Sensor on OpenShift Container Platform
+  kubernetes.core.k8s:
+    state: present
+    definition: "{{ lookup('template', 'templates/' + item)}}"
+  loop:
+    - securedcluster.yaml
 
 - name: Wait for ready sensor
   kubernetes.core.k8s_info:
