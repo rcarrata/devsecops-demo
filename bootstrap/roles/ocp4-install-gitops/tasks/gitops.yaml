@@ -35,10 +35,10 @@
     state: present
     definition: "{{ lookup('template', 'gitops-rb.yml.j2') }}"
 
-- name: Install ArgoCD
-  kubernetes.core.k8s:
-    state: present
-    definition: "{{ lookup('template', 'gitops-argocd.yaml.j2') }}"
+# - name: Install ArgoCD
+#   kubernetes.core.k8s:
+#     state: present
+#     definition: "{{ lookup('template', 'gitops-argocd.yaml.j2') }}"
 
 - name: Get ArgoCD route
   kubernetes.core.k8s_info:
