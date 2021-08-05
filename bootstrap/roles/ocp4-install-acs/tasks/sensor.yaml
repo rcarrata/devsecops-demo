@@ -23,9 +23,7 @@
 - name: Install Sensor on OpenShift Container Platform
   kubernetes.core.k8s:
     state: present
-    definition: "{{ lookup('template', 'templates/' + item)}}"
-  loop:
-    - securedcluster.yaml
+    definition: "{{ lookup('template', 'securedcluster.yaml.j2') }}"
 
 - name: Wait for ready sensor
   kubernetes.core.k8s_info:
