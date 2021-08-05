@@ -176,3 +176,4 @@ Big thanks also to [Rodrigo Alvares](https://github.com/ralvares) that helped wi
 - Add better branching with GitHub Flow model
 - Update images for the infra (nexus, gogs, etc) with the latest versions
 - Use Nexus Operator
+- Use Quay Operator and Clair

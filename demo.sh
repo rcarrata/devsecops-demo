@@ -87,7 +87,7 @@ command.status() {
 
 command.start() {
     info "## Executing Dev Pipeline... ##"
-    oc create -f pipelinerun/pipeline-build-dev-run.yaml -n cicd
+    oc create -f run/pipeline-build-dev-run.yaml -n cicd
     OCP_ROUTE=$(oc whoami --show-console)
     info "Check the pipeline in: \n$OCP_ROUTE/pipelines/ns/cicd/pipeline-runs"
     echo ""
@@ -95,7 +95,7 @@ command.start() {
 
 command.promote() {
     info "## Executing Stage Pipeline... ##"
-    oc create -f pipelinerun/pipeline-build-stage-run.yaml -n cicd
+    oc create -f run/pipeline-build-stage-run.yaml -n cicd
     OCP_ROUTE=$(oc whoami --show-console)
     info "Check the pipeline in: \n$OCP_ROUTE/pipelines/ns/cicd/pipeline-runs"
     echo ""
