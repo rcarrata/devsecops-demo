@@ -4,7 +4,7 @@
     definition: "{{ lookup('template', 'subs-gitops.yml.j2') }}"
 
 - name: Wait for GitOps CRD to exist
-  k8s_facts:
+  kubernetes.core.k8s_info:
     api_version: "apiextensions.k8s.io/v1beta1"
     kind: CustomResourceDefinition
     name: "{{ item }}"
@@ -20,7 +20,7 @@
     definition: "{{ lookup('template', 'subs-pipelines.yml.j2') }}"
 
 - name: Wait for GitOps CRD to exist
-  k8s_facts:
+  kubernetes.core.k8s_info:
     api_version: "apiextensions.k8s.io/v1beta1"
     kind: CustomResourceDefinition
     name: "{{ item }}"
