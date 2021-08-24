@@ -1,40 +1,9 @@
 apiVersion: argoproj.io/v1alpha1
 kind: ArgoCD
 metadata:
-  finalizers:
-  - argoproj.io/finalizer
-  name: argocd
+  name: openshift-gitops
   namespace: openshift-gitops
 spec:
-  controller:
-    processors: {}
-  dex: {}
-  grafana:
-    enabled: false
-    ingress:
-      enabled: false
-    route:
-      enabled: false
-  ha:
-    enabled: false
-  initialSSHKnownHosts: {}
-  prometheus:
-    enabled: false
-    ingress:
-      enabled: false
-    route:
-      enabled: false
-  rbac: {}
-  redis: {}
-  repo: {}
-  resourceExclusions: |
-    - apiGroups:
-      - tekton.dev
-      clusters:
-      - '*'
-      kinds:
-      - TaskRun
-      - PipelineRun
   server:
     autoscale:
       enabled: false
@@ -45,3 +14,53 @@ spec:
       enabled: false
     route:
       enabled: true
+    service:
+      type: ''
+  grafana:
+    enabled: false
+    ingress:
+      enabled: false
+    route:
+      enabled: false
+  prometheus:
+    enabled: false
+    ingress:
+      enabled: false
+    route:
+      enabled: false
+  initialSSHKnownHosts: {}
+  sso:
+    provider: keycloak
+  applicationSet:
+    resources:
+      limits:
+        cpu: '2'
+        memory: 1Gi
+      requests:
+        cpu: 250m
+        memory: 512Mi
+  rbac: {}
+  repo: {}
+  resourceExclusions: |
+    - apiGroups:
+      - tekton.dev
+      clusters:
+      - '*'
+      kinds:
+      - TaskRun
+      - PipelineRun
+  dex: {}
+  ha:
+    enabled: false
+    resources:
+      limits:
+        cpu: 500m
+        memory: 256Mi
+      requests:
+        cpu: 250m
+        memory: 128Mi
+  tls:
+    ca: {}
+  redis: {}
+  controller:
+    processors: {}
