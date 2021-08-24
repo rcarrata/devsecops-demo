@@ -30,9 +30,9 @@ On every push to the spring-petclinic git repository on Gogs git server, the fol
 3. Application is packaged as a JAR and [released to Sonatype Nexus](docs/Steps.md#release-app) snapshot repository
 4. A [container image is built](docs/Steps.md#build-image) in DEV environment using S2I, and pushed to OpenShift internal registry, and tagged with spring-petclinic:[branch]-[commit-sha] and spring-petclinic:latest
 
-## 2. DevSecOps steps using Advanced Cluster Management
+## 2. DevSecOps steps using Advanced Cluster Security for Kubernetes
 
-Advanced Cluster Management for Kubernetes controls clusters and applications from a single console, with built-in security policies.
+Advanced Cluster Security for Kubernetes controls clusters and applications from a single console, with built-in security policies.
 
 Using roxctl and ACS API, we integrated in our pipeline several additional security steps into our DevSecOps pipeline:
 
