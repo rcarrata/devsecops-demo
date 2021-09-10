@@ -96,6 +96,19 @@ For example this Security Policy, checks if a RH Package Manager (dnf,yum) is in
 
 This ensures that we have the total control of our pipelines, and no image is pushed into your registry or deployed in your system that surpases the Security Policies defined.
 
+### Fixing the image
+
+To show a complete demo and show the transition from a "bad image" to an image that passes the build enforcement, we can update the Tekton task of the image build and fix the image. In this example, we will be enabling the enforcement of the "Red Hat Package Manager in Image" policy in ACS, which will fail our pipeline at the image-check as both `yum` and `rpm` package managers are present in our base image.
+
+Update the tekton task:
+1. Delete the `s2i-java-11` task
+    1. With the UI: From the OpenShift UI, make sure you are in the cicd project and then go to Pipelines > Tasks and delete the `s2i-java-11` task.
+    2. With the Tekton cli `tkn task delete s2i-java-11`
+2. Apply the new update task: `kubectl apply -f fix-image/s2ijava-mgr.yaml`
+3. Re-run the pipeline, your deployment now succeeds.
+
+You can check the `s2ijava-mgr.yaml` file for more details. We have added a step to this Task which leverages buildah to remove the package managers from the image (search for "rpm" or "yum" in the file).
+
 # Deploy
 
 ## Prerequisites
