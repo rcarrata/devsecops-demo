@@ -96,7 +96,7 @@ For example this Security Policy, checks if a RH Package Manager (dnf,yum) is in
 
 This ensures that we have the total control of our pipelines, and no image is pushed into your registry or deployed in your system that surpases the Security Policies defined.
 
-### Fixing the image (Optional)
+### Fixing the image
 
 To show a complete demo and show the transition from a "bad image" to an image that passes the build enforcement, we can update the Tekton task of the image build and fix the image. In this example, we will be enabling the enforcement of the "Red Hat Package Manager in Image" policy in ACS, which will fail our pipeline at the image-check as both `yum` and `rpm` package managers are present in our base image.
 
