@@ -119,10 +119,6 @@ Fully automated deployment and integration of every resource and tool needed for
 ./install.sh
 ```
 
-IMPORTANT: this is a working progress, be aware that some parts could not work as expected. PR are welcome :)
-
-NOTE: you want to test the full end2end install using Ansible? Check out the [develop branch](https://github.com/rcarrata/devsecops-demo/tree/develop)!
-
 ## Credentials & Resources
 
 Check the resources deployed for this demo with:
@@ -145,7 +141,7 @@ cd ..
 ./demo.sh start
 ```
 
-NOTE: This pipeline will fail if you don't [disable the "Fixable CVSS >= 7"](docs/disable_policy_enforcement.md) policy enforcement behaviour of ACS. This is expected to demonstrate the failure when a violation of the system policy occurs.
+NOTE: This pipeline will fail if you don't [disable the "Fixable at least Important"](docs/disable_policy_enforcement.md) policy enforcement behaviour of ACS. This is expected to demonstrate the failure when a violation of the system policy occurs.
 
 ## Quick Video with the Demo
 
