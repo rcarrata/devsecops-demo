@@ -5,33 +5,7 @@ metadata:
     tekton.dev/displayName: s2i java 11
     tekton.dev/pipelines.minVersion: 0.11.3
     tekton.dev/tags: s2i, java, workspace
-  creationTimestamp: "2021-09-08T13:36:44Z"
-  generation: 1
-  managedFields:
-  - apiVersion: tekton.dev/v1beta1
-    fieldsType: FieldsV1
-    fieldsV1:
-      f:metadata:
-        f:annotations:
-          .: {}
-          f:tekton.dev/displayName: {}
-          f:tekton.dev/pipelines.minVersion: {}
-          f:tekton.dev/tags: {}
-      f:spec:
-        .: {}
-        f:description: {}
-        f:params: {}
-        f:results: {}
-        f:steps: {}
-        f:volumes: {}
-        f:workspaces: {}
-    manager: OpenAPI-Generator
-    operation: Update
-    time: "2021-09-08T13:36:44Z"
   name: s2i-java-11
-  namespace: cicd
-  resourceVersion: "52296"
-  uid: 77cdac50-f665-4e4f-acbe-d5edcf1681d8
 spec:
   description: s2i-java-11 task clones a Git repository and builds and pushes a container
     image using S2I and a Java 11 builder image.
@@ -140,12 +114,12 @@ spec:
       buildah from --storage-driver=vfs --tls-verify=$(params.TLSVERIFY) '$(params.IMAGE_NAME):$(params.IMAGE_TAG)' > imgname
       buildah run --user=root --storage-driver=vfs `cat imgname` -- sh -c 'rpm -e $(rpm -qa *dnf*) $(rpm -qa *libsolv*) $(rpm -qa *hawkey*) $(rpm -qa yum*) $(rpm -qa *dnf*) $(rpm -qa *subscription-manager*)'
       buildah run --user=root --storage-driver=vfs `cat imgname` -- sh -c 'rpm -e $(rpm -qa *rpm*)'
-      buildah commit --storage-driver=vfs --tls-verify=$(params.TLSVERIFY) `cat imgname` '$(params.IMAGE_NAME):$(params.IMAGE_TAG)' 
+      buildah commit --storage-driver=vfs --tls-verify=$(params.TLSVERIFY) `cat imgname` '$(params.IMAGE_NAME):$(params.IMAGE_TAG)'
     command:
     - /bin/sh
     - -c
     image: registry.redhat.io/rhel8/buildah@sha256:180c4d9849b6ab0e5465d30d4f3a77765cf0d852ca1cb1efb59d6e8c9f90d467
-    name: remove-package-mgr 
+    name: remove-package-mgr
     resources: {}
     volumeMounts:
     - mountPath: /var/lib/containers
