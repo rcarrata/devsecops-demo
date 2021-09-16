@@ -1,0 +1,32 @@
+- name: Create Compliance namespace
+  kubernetes.core.k8s:
+    name: openshift-compliance
+    api_version: v1
+    kind: Namespace
+    state: present
+
+- name: Create OpenShift Objects for Compliance projects
+  k8s:
+    state: present
+    definition: "{{ lookup('template', item ) | from_yaml }}"
+  loop:
+  - ./templates/co-og.yaml.j2
+  - ./templates/co-subs.yaml.j2
+
+- name: Wait for Compliance Operator CRD to exist
+  k8s_facts:
+    api_version: "apiextensions.k8s.io/v1beta1"
+    kind: CustomResourceDefinition
+    name: "{{ item }}"
+  loop: "{{ co_expected_crds }}"
+  register: crds
+  until: crds.resources|length > 0
+  retries: 30
+  delay: 10
+
+- name: Define a Scan Setting Binding 
+  k8s:
+    state: present
+    definition: "{{ lookup('template', item ) | from_yaml }}"
+  loop:
+  - ./templates/co-scan.yaml.j2

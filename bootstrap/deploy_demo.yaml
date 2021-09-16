@@ -20,6 +20,10 @@
       include_role:
         name: "ocp4-config-gitops"
 
+    - name: 'Config Compliance'
+      include_role:
+        name: "ocp4-install-compliance"
+
     - name: 'Install the ACS Central'
       include_role:
         name: "ocp4-install-acs"

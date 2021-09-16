@@ -1,0 +1,12 @@
+apiVersion: compliance.openshift.io/v1alpha1
+kind: ScanSettingBinding
+metadata:
+  name: cis-scan
+profiles:
+- apiGroup: compliance.openshift.io/v1alpha1
+  kind: Profile
+  name: ocp4-cis
+settingsRef:
+  apiGroup: compliance.openshift.io/v1alpha1
+  kind: ScanSetting
+  name: default

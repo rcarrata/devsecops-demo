@@ -1,0 +1,5 @@
+co_expected_crds:
+- compliancecheckresults.compliance.openshift.io
+- complianceremediations.compliance.openshift.io
+- compliancescans.compliance.openshift.io
+- compliancesuites.compliance.openshift.io
