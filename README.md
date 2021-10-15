@@ -104,7 +104,7 @@ Update the tekton task:
 1. Delete the `s2i-java-11` task
     1. With the UI: From the OpenShift UI, make sure you are in the cicd project and then go to Pipelines > Tasks and delete the `s2i-java-11` task.
     2. With the Tekton cli `tkn task delete s2i-java-11`
-2. Apply the new update task: `kubectl apply -f fix-image/s2ijava-nomgr.yaml`
+2. Apply the new update task: `kubectl apply -f fix-image/s2ijava-mgr.yaml`
 3. Re-run the pipeline, your deployment now succeeds.
 
 You can check the `s2ijava-mgr.yaml` file for more details. We have added a step to this Task which leverages buildah to remove the package managers from the image (search for "rpm" or "yum" in the file).
