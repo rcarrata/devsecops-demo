@@ -101,6 +101,7 @@
   uri:
     url: https://{{ r_sonarqube_route.resources[0].spec.host }}
     status_code: 200
+    validate_certs: no
   register: result
   until: result.status == 200
   retries: 10
