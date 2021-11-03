@@ -8,6 +8,11 @@ DevSecOps CICD pipeline demo using several technologies such as:
 - [Openshift GitOps](https://www.openshift.com/blog/announcing-openshift-gitops)
 - [Openshift Advanced Cluster Security for Kubernetes](https://www.redhat.com/en/resources/advanced-cluster-security-for-kubernetes-datasheet)
 - [Openshift Container Registry](https://docs.openshift.com/container-platform/latest/registry/architecture-component-imageregistry.html)
+
+This pipeline also improve security adding:
+
+* Static application security testing (SAST), which analyzes code under development for vulnerabilities and quality issues.
+
 - [SonarQube](https://www.sonarqube.org/)
 - [Nexus](https://www.sonatype.com/products/repository-oss?topnav=true)
 - [JUnit](https://junit.org/junit5/)
@@ -15,6 +20,14 @@ DevSecOps CICD pipeline demo using several technologies such as:
 - [Git Webhook](https://tekton.dev/docs/triggers/)
 - [Gatling](https://gatling.io/)
 - [Zap Proxy](https://www.zaproxy.org/)
+
+Vulnerability and configuration management methods include:
+
+    Static application security testing (SAST), which analyzes code under development for vulnerabilities and quality issues.
+    Software composition analysis (SCA), which examines dependent packages included with applications, looking for known vulnerabilities and licensing issues.
+    Interactive application security testing (IAST) and dynamic application security testing (DAST) tools, which analyze running applications to find execution vulnerabilities.
+    Configuration management with analysis and management of application and infrastructure configurations in DevOps. Traditionally this was not used as a way to improve security. But properly managing configurations in a GitOps process can strengthen security by improving change controls, identifying configuration defects that can reduce the attack surface, and signing and tracking authorship for better accountability and opportunities to improve.
+    Image risk is any risk associated with a container image. This includes vulnerable dependencies, embedded secrets, bad configurations, malware, or images that are not trusted.
 
 # Overview
 
@@ -115,7 +128,7 @@ ansible-galaxy collection install community.kubernetes
 
 Fully automated deployment and integration of every resource and tool needed for this demo.
 
-```
+```sh
 ./install.sh
 ```
 
@@ -123,7 +136,7 @@ Fully automated deployment and integration of every resource and tool needed for
 
 Check the resources deployed for this demo with:
 
-```
+```sh
 ./status.sh
 ```
 
@@ -136,7 +149,7 @@ Check the resources deployed for this demo with:
 
 ## Run the demo!
 
-```
+```sh
 cd ..
 ./demo.sh start
 ```

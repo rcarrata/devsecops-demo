@@ -12,7 +12,7 @@ spec:
     path: environments/stage
     repoURL: http://{{ r_gogs_route.resources[0].spec.host }}/gogs/spring-petclinic-config
     targetRevision: HEAD
-  # syncPolicy:
-  #   automated:
-  #     prune: true
-  #     selfHeal: true
+  syncPolicy:
+    automated:
+      prune: false
+      selfHeal: false
