@@ -21,13 +21,13 @@ This pipeline also improve security adding:
 - [Gatling](https://gatling.io/)
 - [Zap Proxy](https://www.zaproxy.org/)
 
-Vulnerability and configuration management methods include:
+Vulnerability and configuration management methods included in this demo are the following:
 
-    Static application security testing (SAST), which analyzes code under development for vulnerabilities and quality issues.
-    Software composition analysis (SCA), which examines dependent packages included with applications, looking for known vulnerabilities and licensing issues.
-    Interactive application security testing (IAST) and dynamic application security testing (DAST) tools, which analyze running applications to find execution vulnerabilities.
-    Configuration management with analysis and management of application and infrastructure configurations in DevOps. Traditionally this was not used as a way to improve security. But properly managing configurations in a GitOps process can strengthen security by improving change controls, identifying configuration defects that can reduce the attack surface, and signing and tracking authorship for better accountability and opportunities to improve.
-    Image risk is any risk associated with a container image. This includes vulnerable dependencies, embedded secrets, bad configurations, malware, or images that are not trusted.
+* **Static application security testing (SAST)**, which analyzes code under development for vulnerabilities and quality issues.
+* **Software composition analysis (SCA)**, which examines dependent packages included with applications, looking for known vulnerabilities and licensing issues.
+* **Interactive application security testing (IAST)** and **dynamic application security testing (DAST)** tools, which analyze running applications to find execution vulnerabilities.
+* **Configuration management** with analysis and management of application and infrastructure configurations in DevOps. Traditionally this was not used as a way to improve security. But properly managing configurations in a GitOps process can strengthen security by improving change controls, identifying configuration defects that can reduce the attack surface, and signing and tracking authorship for better accountability and opportunities to improve.
+* **Image risk** is any risk associated with a container image. This includes vulnerable dependencies, embedded secrets, bad configurations, malware, or images that are not trusted.
 
 # Overview
 
@@ -191,11 +191,3 @@ NOTE: This pipeline will fail if you don't [disable the "Fixable at least Import
 This repo is heavily based in the [CICD repository](https://github.com/siamaksade/openshift-cicd-demo) and work of Siamak Sadeghianfar. Kudos to Siamak!
 
 Big thanks also to [Rodrigo Alvares](https://github.com/ralvares) that helped with their wisdom and knowledge in this demo.
-
-## TODO
-
-- Add documentation about triggers
-- Add better branching with GitHub Flow model
-- Update images for the infra (nexus, gogs, etc) with the latest versions
-- Use Nexus Operator
-- Use Quay Operator and Clair
