@@ -1,4 +1,8 @@
+{% if ocp4_cluster_version is version_compare('4.9', '<')%}
 apiVersion: argoproj.io/v1alpha1
+{% else %}
+apiVersion: argoproj.io/v1
+{% endif %}
 kind: ArgoCD
 metadata:
   name: openshift-gitops
