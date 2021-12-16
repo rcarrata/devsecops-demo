@@ -27,7 +27,7 @@ This pipeline also improve security adding the following Open Source components:
 - [Gatling](https://gatling.io/)
 - [Zap Proxy](https://www.zaproxy.org/)
 
-* NOTE: Tested and fully working for 4.7-4.8 OpenShift Clusters. Due to a K8s API versions deprecation we're working to [fix the issues for 4.9.x](https://github.com/rcarrata/devsecops-demo/issues). Please be patient! 
+* NOTE: Tested and fully working for 4.7+ OpenShift Clusters, including >=4.9!
 
 # Overview
 
