@@ -126,20 +126,36 @@ You can check the `s2ijava-mgr.yaml` file for more details. We have added a step
 
 ## Prerequisites
 
+- A RHEL or Fedora box
 - Openshift Cluster 4.7+
+- `oc` binary
 - Ansible 2.7+
+- Git
 
 * [Install Ansible](https://docs.ansible.com/ansible/latest/installation_guide/intro_installation.html#installing-ansible-on-rhel-centos-or-fedora)
 
 * [Install Kubernetes Ansible Module](https://docs.ansible.com/ansible/latest/collections/community/kubernetes/k8s_module.html)
 
-```
+```sh
 ansible-galaxy collection install community.kubernetes
+pip3 install kubernetes
+```
+
+Install some extra Python dependency:
+
+```sh
+pip3 install jmespath
 ```
 
 ## Bootstrap
 
 Fully automated deployment and integration of every resource and tool needed for this demo.
+
+```sh
+oc login --token=yourtoken --server=https://yourocp
+```
+
+Run the installer:
 
 ```sh
 ./install.sh
