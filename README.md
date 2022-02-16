@@ -139,6 +139,7 @@ You can check the `s2ijava-mgr.yaml` file for more details. We have added a step
 ```sh
 ansible-galaxy collection install community.kubernetes
 pip3 install kubernetes
+pip3 install openshift
 ```
 
 Install some extra Python dependency:
