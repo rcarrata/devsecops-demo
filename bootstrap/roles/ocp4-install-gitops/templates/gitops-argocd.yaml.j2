@@ -16,8 +16,12 @@ spec:
         enabled: false
     ingress:
       enabled: false
+    insecure: true
     route:
       enabled: true
+      tls:
+        insecureEdgeTerminationPolicy: Redirect
+        termination: edge
     service:
       type: ''
   grafana:
