@@ -17,5 +17,4 @@ err() {
 }
 
 info "Installing Demo"
-ansible-playbook bootstrap/deploy_demo.yaml
-
+ansible-playbook bootstrap/deploy_demo.yaml -v

@@ -1,8 +1,4 @@
-{% if ocp4_cluster_version is version_compare('4.9', '<')%}
 apiVersion: argoproj.io/v1alpha1
-{% else %}
-apiVersion: argoproj.io/v1
-{% endif %}
 kind: ArgoCD
 metadata:
   name: openshift-gitops
@@ -16,8 +12,12 @@ spec:
         enabled: false
     ingress:
       enabled: false
+    insecure: true
     route:
       enabled: true
+      tls:
+        insecureEdgeTerminationPolicy: Redirect
+        termination: edge
     service:
       type: ''
   grafana:
@@ -43,7 +43,9 @@ spec:
       requests:
         cpu: 250m
         memory: 512Mi
-  rbac: {}
+  rbac:
+    policy: 'g, system:cluster-admins, role:admin'
+    scopes: '[groups]'
   repo: {}
   resourceExclusions: |
     - apiGroups:
@@ -53,7 +55,8 @@ spec:
       kinds:
       - TaskRun
       - PipelineRun
-  dex: {}
+  dex:
+    openShiftOAuth: true
   ha:
     enabled: false
     resources:

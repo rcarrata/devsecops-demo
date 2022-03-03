@@ -25,7 +25,7 @@ spec:
     - name: flags
       default: --
     - name: argocd-version
-      default: v2.0.3
+      default: v2.2.5
   stepTemplate:
     envFrom:
       - configMapRef:
@@ -33,17 +33,13 @@ spec:
       - secretRef:
           name: argocd-env-secret  # used for authentication (username/password or auth token)
   steps:
-    - name: login-wait
+    - name: login-sync-wait
       image: quay.io/rcarrata/argocd:$(params.argocd-version)
       script: |
         if [ -z $ARGOCD_AUTH_TOKEN ]; then
-          yes | argocd login $ARGOCD_SERVER --username=$ARGOCD_USERNAME --password=$ARGOCD_PASSWORD;
+          yes | argocd login $ARGOCD_SERVER --username=$ARGOCD_USERNAME --password=$ARGOCD_PASSWORD ;
         fi
-    - name: sync
-      image: quay.io/rcarrata/argocd:$(params.argocd-version)
-      script: |
-        argocd app sync $(params.application-name) --revision $(params.revision) $(params.flags)
-    - name: wait
-      image: quay.io/rcarrata/argocd:$(params.argocd-version)
-      script: |
+
+        argocd app sync $(params.application-name) --revision $(params.revision) $(params.flags) && sleep 3
+
         argocd app wait $(params.application-name) --health $(params.flags)
