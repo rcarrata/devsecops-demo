@@ -1,7 +1,4 @@
 pipelines_expected_crds:
-- pipelineresources.tekton.dev
-- pipelineruns.tekton.dev
-- pipelines.tekton.dev
 - tektonpipelines.operator.tekton.dev
 
 gitops_expected_crds:
