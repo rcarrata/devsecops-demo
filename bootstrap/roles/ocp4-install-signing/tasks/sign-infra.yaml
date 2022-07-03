@@ -1,0 +1,89 @@
+- name: Create OpenShift Objects to build a pod to run Cosign Binary
+  k8s:
+    state: present
+    definition: "{{ lookup('template', item ) | from_yaml }}"
+  loop:
+  - ./templates/cosign-ubi-is.yaml.j2
+  - ./templates/cosign-is.yaml.j2
+  - ./templates/cosign-build.yaml.j2
+ 
+- name: Wait Until cosign build is complete
+  shell: |
+    oc get build -l build=cosign-pod -n openshift-pipelines --sort-by=.metadata.creationTimestamp | tail -n 1 | awk '{print $4}'
+  register: build_status
+  retries: 10
+  delay: 20
+  until:
+    - build_status.stdout == "Complete"
+
+- name: Make Sure Any Previously Generated Secrets are Absent
+  kubernetes.core.k8s:
+    state: absent
+    api_version: v1
+    kind: Secret
+    namespace: "{{ tekton_operator_namespace }}"
+    name: "{{ secret_generate_name }}"
+    wait: yes
+
+#- name: Make Sure Old Jobs are Absent
+#  kubernetes.core.k8s:
+#    state: absent
+#    api_version: batch/v1
+#    kind: Job
+#    namespace: "{{ tekton_operator_namespace }}"
+#    name: cosign-generate-keys
+#    wait: yes
+
+- name: Generate Random Cosign Password 
+  set_fact:
+    cosign_password: "{{ lookup('password', '/dev/null chars=ascii_lowercase,digits length=6') }}"
+
+#Anyuid seems to be required by cosign image
+- name: Create OpenShift Objects for Cosign Usage
+  k8s:
+    state: present
+    definition: "{{ lookup('template', item ) | from_yaml }}"
+  loop:
+  - ./templates/cosign-serviceaccount.yaml.j2
+#  - ./templates/cosign-anyuid-scc.yaml.j2
+  - ./templates/cosign-role.yaml.j2
+  - ./templates/cosign-rolebinding.yaml.j2
+  - ./templates/cosign-rolebinding-cicd.yaml.j2
+#  - ./templates/cosign-generate-job.yaml.j2
+  - ./templates/cosign-deployment.yaml.j2
+
+- name: Wait till Cosign Deployment is Ready
+  k8s_info:
+      kind: Deployment
+      name: cosign-pod
+      namespace: "{{ tekton_operator_namespace }}"
+  register: output_info
+  until: output_info.resources | json_query('[*].status.conditions[?reason==`NewReplicaSetAvailable`][].status') | select ('match','True') | list | length == 1
+  delay: 5
+  retries: 5
+
+- name: Get Cosign Pod Name
+  shell: |
+    oc get pods -n "{{ tekton_operator_namespace }}" -l app=cosign-pod --sort-by=.metadata.creationTimestamp | tail -n 1| awk '{print $1}'
+  register: pod_name
+
+- name: Create Cosign Secret
+  shell: |
+    oc exec pod/"{{ pod_name.stdout }}" -n "{{ tekton_operator_namespace }}" -- /bin/bash -c 'cd /test && cosign generate-key-pair k8s://"{{ tekton_operator_namespace }}"/"{{ secret_generate_name }}"'
+
+# - name: Create Cosign Secret
+#   kubernetes.core.k8s_exec:
+#     namespace: "{{ tekton_operator_namespace }}"
+#     pod: "{{ pod_name.stdout }}"
+#     command: cosign generate-key-pair k8s://"{{ tekton_operator_namespace }}"/"{{ secret_generate_name }}"
+#   register: command_status
+#  ignore_errors: True
+
+- name: Confirm Cosign Secret is Created
+  kubernetes.core.k8s:
+    state: present
+    api_version: v1
+    kind: Secret
+    namespace: "{{ tekton_operator_namespace }}"
+    name: "{{ secret_generate_name }}"
+    wait: yes

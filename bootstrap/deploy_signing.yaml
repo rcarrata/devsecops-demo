@@ -1,0 +1,9 @@
+---
+- name: 'Install the ACS Demo'
+  hosts: localhost
+  connection: local
+  tasks:
+
+    - name: 'Enable Tekton Chaining'
+      include_role:
+        name: "ocp4-install-signing"    

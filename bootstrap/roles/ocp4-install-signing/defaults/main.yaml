@@ -1,0 +1,10 @@
+tekton_chain_keys:
+  "artifacts.oci.storage": ""
+  "artifacts.taskrun.format": "tekton"
+  "artifacts.taskrun.storage": "tekton"
+  "artifacts.oci.signer": "x509"
+  "artifacts.oci.format": "simplesigning"
+tekton_operator_namespace: openshift-pipelines
+cosign_image: "image-registry.openshift-image-registry.svc:5000/openshift-pipelines/cosign-pod:latest"
+#cosign_image: "gcr.io/projectsigstore/cosign:v1.9.0"
+secret_generate_name: signing-secrets

@@ -1,0 +1,29 @@
+
+#Tekton CR Based Installation - https://docs.openshift.com/container-platform/4.10/cicd/pipelines/using-tekton-chains-for-openshift-pipelines-supply-chain-security.html
+- name: Create OpenShift Objects for Openshift Pipeline Tekton Chains
+  k8s:
+    state: present
+    definition: "{{ lookup('template', item ) | from_yaml }}"
+  loop:
+  - ./templates/tektonchain-cr.yaml.j2
+  when: ansible_distribution == "Debian"
+
+# Wait Until TektonChain Controller Is Ready
+- name: Get TektonChain Pod
+  kubernetes.core.k8s_info:
+    kind: Pod
+    api_version: v1
+    namespace: "{{ tekton_operator_namespace }}"
+    label_selectors:
+     - app = tekton-chains-controller
+    wait: yes
+  retries: 3
+  delay: 20
+
+- name: Patch the CM of Openshift Piplines to enable Tekton Chains
+  command: oc patch configmap chains-config -n {{ tekton_operator_namespace }} -p='{"data":{'\"{{ item.key }}\"':'\"{{ item.value }}\"'}}'
+  loop: "{{ tekton_chain_keys | dict2items }}"
+
+- name: Recreate Tekton Chain Controller
+  shell: |
+    oc delete po -l app=tekton-chains-controller -n "{{ tekton_operator_namespace }}"

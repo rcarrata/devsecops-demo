@@ -1,0 +1,12 @@
+kind: ClusterRoleBinding
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: cosign-sa-anyuid-scc
+subjects:
+  - kind: ServiceAccount
+    name: cosign-sa
+    namespace: {{ tekton_operator_namespace }}
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: 'system:openshift:scc:anyuid'
