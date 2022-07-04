@@ -27,7 +27,7 @@ spec:
       FROM registry.redhat.io/ubi8/ubi:8.0
 
 
-      RUN yum install go git wget tar -y &&  wget
+      RUN yum install go git wget tar rsync -y && wget
       https://github.com/sigstore/cosign/releases/download/v1.9.0/cosign-1.9.0.x86_64.rpm
       \
           && yum localinstall -y cosign-1.9.0.x86_64.rpm \

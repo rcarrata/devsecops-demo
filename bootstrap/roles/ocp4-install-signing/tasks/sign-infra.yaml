@@ -9,7 +9,7 @@
  
 - name: Wait Until cosign build is complete
   shell: |
-    oc get build -l build=cosign-pod -n openshift-pipelines --sort-by=.metadata.creationTimestamp | tail -n 1 | awk '{print $4}'
+    oc get build -l build=cosign-pod -n "{{ tekton_operator_namespace }}" --sort-by=.metadata.creationTimestamp | tail -n 1 | awk '{print $4}'
   register: build_status
   retries: 10
   delay: 20

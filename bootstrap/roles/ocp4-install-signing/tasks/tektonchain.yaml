@@ -1,14 +1,23 @@
+#Tekton Manifest Based Installation -https://github.com/tektoncd/chains#installation
+- name: Install Tekton Chains via Manifest
+  shell: |
+    oc apply -f https://storage.googleapis.com/tekton-releases/chains/previous/"{{ tekton_chain_version }}"/release.yaml
+  when: tekton_install_type == "manifest"
 
 #Tekton CR Based Installation - https://docs.openshift.com/container-platform/4.10/cicd/pipelines/using-tekton-chains-for-openshift-pipelines-supply-chain-security.html
-- name: Create OpenShift Objects for Openshift Pipeline Tekton Chains
+- name: Install Tekton Chains via Pipeline CR
   k8s:
     state: present
     definition: "{{ lookup('template', item ) | from_yaml }}"
   loop:
   - ./templates/tektonchain-cr.yaml.j2
-  when: ansible_distribution == "Debian"
+  when: tekton_install_type != "manifest"
 
-# Wait Until TektonChain Controller Is Ready
+- name: Apply TektonChain Controller SCC
+  shell: |
+    oc project {{ tekton_operator_namespace }} && oc adm policy add-scc-to-user nonroot -z tekton-chains-controller
+
+# Wait Until TektonChain Controller Pod Is Ready
 - name: Get TektonChain Pod
   kubernetes.core.k8s_info:
     kind: Pod

@@ -103,17 +103,36 @@ command.promote() {
 }
 
 command.sign-verify() {
-    info "## Will attempt to verify "
-    cosign_pod=$(oc get pods -n openshift-pipelines -l app=cosign-pod --sort-by=.metadata.creationTimestamp | tail -n 1| awk '{print $1}')
+    info "## Will attempt to verify TaskRuns of Last Pipelinerun"
+    tekton_chain_namespaces=("openshift-pipelines" "tekton-chains")
+    working_namespace=""
+    verify_script="verify-pipeline.sh"
 
-    if [ -z "$cosign_pod" ]    
+    for namespace in ${tekton_chain_namespaces[@]}
+    do 
+      pod_check=$(oc get pods -n $namespace -l app=cosign-pod 2>&1)
+      if echo ${pod_check} | grep -iv "No resources found"
+      then
+        working_namespace=$namespace
+        cosign_pod=$(oc get pods -n $namespace -l app=cosign-pod --sort-by=.metadata.creationTimestamp | tail -n 1| awk '{print $1}')
+      fi
+    done    
+
+    if [ -z "${cosign_pod:-}" ]    
     then
-      echo "Cosign Pod not Found"
+      info "## Cosign Pod not Found,Please make sure to run the deploy_signing.yaml"
       exit 1
+    else
+      info "## Cosign Pod(${cosign_pod}) found in namespace:${namespace}"
     fi
     
+    info "## Copying Verification Script to Cosign Pod(${cosign_pod})"
+    oc rsync --include=${verify_script} -n $working_namespace ./run/verify $cosign_pod:/test > /dev/null
+    
+    info "## Attemtpting to run verification script in Pod(${cosign_pod})"
+    oc exec pod/"$cosign_pod" -n $working_namespace -- /bin/bash -c "chmod ugo+x /test/verify/${verify_script}"
+    oc exec pod/"$cosign_pod" -n $working_namespace -- /bin/bash -c "/test/verify/${verify_script} $working_namespace "
 
-    oc exec pod/"$cosign_pod" -n openshift-pipelines -- /bin/bash -c "/test/verify.sh"
     # echo "Obtaining cosign.key"
     # oc exec pod/"$cosign_pod" -n openshift-pipelines -- /bin/bash -c "oc get secret/signing-secrets -n openshift-pipelines -o jsonpath='{.data.cosign\.key}' | base64 -d > /test/cosign.key"
     # echo "Obtaining cosign.password"
