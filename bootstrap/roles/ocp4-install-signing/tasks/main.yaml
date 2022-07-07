@@ -1,4 +1,4 @@
 - import_tasks: tektonchain.yaml
-- import_tasks: sign-infra.yaml
+- import_tasks: cosign-infra.yaml
 
 

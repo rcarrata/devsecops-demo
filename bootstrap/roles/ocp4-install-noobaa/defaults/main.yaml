@@ -1,0 +1,3 @@
+noobaa_storage_class: ""
+noobaa_size: "50Gi"
+backing_store_name: "noobaa-pv-backing-store"

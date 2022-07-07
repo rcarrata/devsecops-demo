@@ -1,0 +1,13 @@
+- name: 'Extend Original Demo to Include TaskRun and Image Signing'
+  hosts: localhost
+  connection: local
+  tasks:
+
+    # - name: 'Install NooBaa'
+    #   include_role:
+    #     name: "ocp4-install-noobaa"
+
+    - name: 'Install Quay'
+      include_role:
+        name: "ocp4-install-quay"   
+

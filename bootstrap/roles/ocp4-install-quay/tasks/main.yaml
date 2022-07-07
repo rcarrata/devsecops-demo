@@ -1,0 +1,2 @@
+- import_tasks: install-quay.yaml
+- import_tasks: configure-quay.yaml
