@@ -3,11 +3,14 @@ quay_admin_username: quayadmin
 quay_admin_email: quayadmin@redhat.com
 quay_admin_password: quaypass123
 quay_registry_name: demo-registry
-quay_org_name: cicd-demof
-quay_repository: demo-repof
-quay_robot_account: demo_robotf
+quay_org_name: cicd-demo
+quay_secret_name: quay-demo-secret
+quay_repositories:
+  - spring-petclinic-dev
+  - spring-petclinic-stage
+quay_robot_account: demo_robot
 csrf_pattern: ".*window.__token\ =\ '(.*)';.*"
-#Can obtain status codes from Swagger of route/api/v1/discovery
+#Can obtain status codes from Swagger of quay route/api/v1/discovery
 quay_user_found_success_status_code: 200
 quay_org_not_found_error_code: 404
 quay_org_found_success_status_code: 200

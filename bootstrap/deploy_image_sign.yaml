@@ -7,7 +7,6 @@
     #   include_role:
     #     name: "ocp4-install-noobaa"
 
-    - name: 'Install Quay'
+    - name: 'Install Requirements for Image Signing'
       include_role:
-        name: "ocp4-install-quay"   
-
+        name: "ocp4-install-sign-patch"   

@@ -2,7 +2,7 @@ kind: BuildConfig
 apiVersion: build.openshift.io/v1
 metadata:
   name: cosign-pod
-  namespace: {{ tekton_operator_namespace }}
+  namespace: {{ pipeline_namespace }}
   labels:
     build: cosign-pod
 spec:
@@ -33,8 +33,11 @@ spec:
           && yum localinstall -y cosign-1.9.0.x86_64.rpm \
           && wget https://mirror.openshift.com/pub/openshift-v4/x86_64/clients/ocp/stable/openshift-client-linux.tar.gz \
           && tar -xvf openshift-client-linux.tar.gz && mv oc /usr/local/bin \
+          && rm -rf openshift-client-linux.tar.gz \
+          && rm -rf cosign-1.9.0.x86_64.rpm \
           && mkdir /.docker \
-          && mkdir -p /tekton/home
+          && mkdir -p /tekton/home \
+          && mkdir /workdir
 
       USER 0
 
@@ -43,7 +46,11 @@ spec:
           chgrp -R 0 /.docker && \
           chmod -R g=u /.docker && \
           chgrp -R 0 /tekton/home && \
-          chmod -R g=u /tekton/home
+          chmod -R g=u /tekton/home && \
+          chgrp -R 0 /workdir && \
+          chmod -R g=u /workdir
+
+      WORKDIR /workdir
 
       USER 1001
       

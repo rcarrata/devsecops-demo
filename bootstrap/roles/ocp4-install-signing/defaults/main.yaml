@@ -5,10 +5,12 @@ tekton_chain_keys:
   "artifacts.oci.signer": "x509"
   "artifacts.oci.format": "simplesigning"
 #tekton_operator_namespace: openshift-pipelines
+pipeline_namespace: cicd
 tekton_operator_namespace: tekton-chains
 tekton_chain_version: 'v0.10.0'
 tekton_install_type: manifest
-cosign_image: "image-registry.openshift-image-registry.svc:5000/{{ tekton_operator_namespace }}/cosign-pod:latest"
+cosign_image: "image-registry.openshift-image-registry.svc:5000/{{ pipeline_namespace }}/cosign-pod:latest"
 #cosign_image: "gcr.io/projectsigstore/cosign:v1.9.0"
 secret_generate_name: signing-secrets
+stackrox_central_admin_password: stackrox
 

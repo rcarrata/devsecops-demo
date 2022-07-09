@@ -2,7 +2,7 @@ kind: ImageStream
 apiVersion: image.openshift.io/v1
 metadata:
   name: ubi
-  namespace: {{ tekton_operator_namespace }}
+  namespace: {{ pipeline_namespace }}
   labels:
     build: cosign-pod
 spec:

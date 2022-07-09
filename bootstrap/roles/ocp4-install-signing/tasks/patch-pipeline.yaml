@@ -1,0 +1,42 @@
+- name: Check if Quay Secret Exists
+  k8s_info:
+      kind: Secret
+      name: "{{ quay_secret_name }}"
+      namespace: "{{ pipeline_namespace }}"
+  register: secret_check_status
+
+- name: Create Quay Secret in Pipeline Namespace
+  shell: |
+    oc create secret docker-registry "{{ quay_secret_name }}" --docker-server="{{ quay_route }}" --docker-username="{{ quay_org_name }}+{{ quay_robot_account }}" --docker-password="{{ quay_robot_token }}" --docker-email="" -n "{{ pipeline_namespace }}"
+  when:
+    secret_check_status.resources | length<1
+
+- name: Link Quay Secret to Pipeline ServiceAccount
+  shell: | 
+    oc secrets link pipeline "{{ quay_secret_name }}" --for=pull,mount -n {{ pipeline_namespace }}
+
+# Check Gogs
+- name: Get gogs route
+  kubernetes.core.k8s_info:
+    kind: Route
+    api_version: route.openshift.io/v1
+    namespace: cicd
+    name: gogs
+  register: r_gogs_route
+  retries: 10
+  delay: 20
+  until:
+    - r_gogs_route.resources[0].spec.host is defined
+
+- name: Debug gogs route
+  debug:
+    msg: "{{ r_gogs_route.resources[0].spec.host }}"
+
+- name: Create OpenShift Objects for Openshift Pipelines Templates
+  k8s:
+    state: present
+    definition: "{{ lookup('template', item ) | from_yaml }}"
+  loop:
+  - ./templates/pipeline-build-dev.yaml.j2
+  - ./templates/pipeline-build-stage.yaml.j2
+#  - ./templates/pipeline-build-pvc.yaml.j2

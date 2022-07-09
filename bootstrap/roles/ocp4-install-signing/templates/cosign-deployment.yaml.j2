@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: cosign-pod
-  namespace: {{ tekton_operator_namespace }}
+  namespace: {{ pipeline_namespace }}
 spec:
   selector:
     matchLabels:
@@ -24,11 +24,5 @@ spec:
           args:
             - -c             
             - sleep infinity
-          volumeMounts:
-          - mountPath: /test
-            name: empty-volume
-      volumes:
-        - name: empty-volume
-          emptyDir: {}
-      serviceAccountName: cosign-sa
-      serviceAccount: cosign-sa
+      serviceAccountName: pipeline
+      serviceAccount: pipeline

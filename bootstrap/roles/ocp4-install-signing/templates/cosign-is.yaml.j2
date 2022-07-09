@@ -2,7 +2,7 @@ kind: ImageStream
 apiVersion: image.openshift.io/v1
 metadata:
   name: cosign-pod
-  namespace: {{ tekton_operator_namespace }}
+  namespace: {{ pipeline_namespace }}
   labels:
     build: cosign-pod
 spec:
@@ -10,4 +10,4 @@ spec:
     local: false
 status:
   dockerImageRepository: >-
-    image-registry.openshift-image-registry.svc:5000/openshift-pipelines/cosign-pod
+    image-registry.openshift-image-registry.svc:5000/{{ pipeline_namespace }}/cosign-pod
