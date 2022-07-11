@@ -104,7 +104,7 @@ command.promote() {
 
 command.sign-verify() {
     info "## Will attempt to verify TaskRuns of Last Pipelinerun"
-    tekton_chain_namespaces=("openshift-pipelines" "tekton-chains")
+    tekton_chain_namespaces=("cicd")
     working_namespace=""
     verify_script="verify-pipeline.sh"
 
@@ -127,11 +127,11 @@ command.sign-verify() {
     fi
     
     info "## Copying Verification Script to Cosign Pod(${cosign_pod})"
-    oc rsync --include=${verify_script} -n $working_namespace ./run/verify $cosign_pod:/test > /dev/null
+    oc rsync --include=${verify_script} -n $working_namespace ./run/verify $cosign_pod:/workdir > /dev/null
     
     info "## Attemtpting to run verification script in Pod(${cosign_pod})"
-    oc exec pod/"$cosign_pod" -n $working_namespace -- /bin/bash -c "chmod ugo+x /test/verify/${verify_script}"
-    oc exec pod/"$cosign_pod" -n $working_namespace -- /bin/bash -c "/test/verify/${verify_script} $working_namespace "
+    oc exec pod/"$cosign_pod" -n $working_namespace -- /bin/bash -c "chmod ugo+x /workdir/verify/${verify_script}"
+    oc exec pod/"$cosign_pod" -n $working_namespace -- /bin/bash -c "/workdir/verify/${verify_script} $working_namespace "
 
     # echo "Obtaining cosign.key"
     # oc exec pod/"$cosign_pod" -n openshift-pipelines -- /bin/bash -c "oc get secret/signing-secrets -n openshift-pipelines -o jsonpath='{.data.cosign\.key}' | base64 -d > /test/cosign.key"

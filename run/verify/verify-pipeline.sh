@@ -5,7 +5,7 @@ echo "## Verify Starting Script"
 tekton_secret_namespace="${1:-openshift-pipelines}"
 cosign_secret_name="${2:-signing-secrets}"
 pipeline_namespace="${3:-cicd}"
-writable_space="${4:-/test}"
+writable_space="${4:-/workdir}"
 pipeline_label="${5:-petclinic-build-dev}"
 
 #Can get Secrets Directly but will depend on Kubernetes Permission

@@ -393,3 +393,29 @@
         - quay_perm_response.status != quay_perm_success_status_code
   when: 
     - "'Cannot initialize user in a non-empty database' in init_output_msg" 
+
+- name: Delete any Previously Existing Quay Secret
+  kubernetes.core.k8s:
+    state: absent
+    api_version: v1
+    kind: Secret
+    namespace: "{{ item }}"
+    name: "{{ quay_secret_name }}"
+    wait: yes
+  loop: "{{ secret_required_namespaces }}"
+
+#Create Quay Secret so other roles can use
+- name: Create Quay Secret in Namespaces that require secret
+  shell: |
+    oc create secret docker-registry "{{ quay_secret_name }}" --docker-server="{{ quay_route }}" --docker-username="{{ quay_org_name }}+{{ quay_robot_account }}" --docker-password="{{ quay_robot_token }}" --docker-email="" -n "{{ item }}"
+  loop: "{{ secret_required_namespaces }}"
+    
+- name: Confirm Quay Secret is Created
+  kubernetes.core.k8s:
+    state: present
+    api_version: v1
+    kind: Secret
+    namespace: "{{ item }}"
+    name: "{{ quay_secret_name }}"
+    wait: yes
+  loop: "{{ secret_required_namespaces }}"

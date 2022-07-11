@@ -137,6 +137,21 @@ spec:
     workspaces:
     - name: source
       workspace: workspace
+  - name: image-sign
+    taskRef:
+      name: cosign-task
+    runAfter:
+    - build-image
+    params:
+      - name: IMAGE
+        value: "image-registry.openshift-image-registry.svc:5000/{{pipeline_namespace}}/cosign-pod"
+      - name: SIGNATURE_IMAGE
+        value: "{{ quay_route}}/{{ quay_org_name }}/spring-petclinic-stage"
+      - name: ARGS
+        value: 
+          - "sign"
+          - "--allow-insecure-registry"
+          - "--key k8s://{{ pipeline_namespace }}/{{ secret_generate_name }}"
   - name: image-scan
     runAfter:
     - build-image
@@ -191,6 +206,7 @@ spec:
       workspace: workspace
   - name: update-deployment
     runAfter:
+    - image-sign
     - image-scan
     - image-check
     - deploy-check

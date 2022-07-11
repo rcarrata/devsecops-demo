@@ -5,15 +5,34 @@
       namespace: "{{ pipeline_namespace }}"
   register: secret_check_status
 
-- name: Create Quay Secret in Pipeline Namespace
+- name: extract quay hostname
   shell: |
-    oc create secret docker-registry "{{ quay_secret_name }}" --docker-server="{{ quay_route }}" --docker-username="{{ quay_org_name }}+{{ quay_robot_account }}" --docker-password="{{ quay_robot_token }}" --docker-email="" -n "{{ pipeline_namespace }}"
-  when:
-    secret_check_status.resources | length<1
+    oc get route {{ quay_registry_name }}-quay -o jsonpath='{.spec.host}' -n {{ quay_project_name }}
+  register: quay_hostname_result
+  delay: 5
+  retries: 10
+  until:
+    - quay_hostname_result.stdout != ""
 
-- name: Link Quay Secret to Pipeline ServiceAccount
+- name: Set Quay hostname
+  ansible.builtin.set_fact:
+    quay_route: "{{ quay_hostname_result.stdout }}"
+
+- name: Link Quay Secret to Pipeline ServiceAccount for Pipeline Namespace
   shell: | 
     oc secrets link pipeline "{{ quay_secret_name }}" --for=pull,mount -n {{ pipeline_namespace }}
+
+- name: Link Quay Secret to default accounts for namespaces that should pull from quay
+  shell: | 
+    oc secrets link default "{{ quay_secret_name }}" --for=pull,mount -n {{ item }}
+  loop: "{{ secret_required_namespaces }}"
+
+- name: Create Quay Signing Task
+  k8s:
+    state: present
+    definition: "{{ lookup('template', item ) | from_yaml }}"
+  loop:
+  - ./templates/cosign-task.yaml.j2
 
 # Check Gogs
 - name: Get gogs route
@@ -40,3 +59,27 @@
   - ./templates/pipeline-build-dev.yaml.j2
   - ./templates/pipeline-build-stage.yaml.j2
 #  - ./templates/pipeline-build-pvc.yaml.j2
+
+- name: Patch Openshift Image Config - Message
+  ansible.builtin.debug:
+    msg: "As we did not generate a cert, we need to add our quay registry as an insecure registry in Openshift"
+
+- name: Patch Openshift Image Config
+  ansible.builtin.shell: |
+    oc patch image.config.openshift.io cluster --type=merge -p '{"spec":{"registrySources":{"insecureRegistries":["{{ quay_route }}"]}}}'
+  register: insecure_patch  
+
+- name: Pause for 4 minutes to wait for MCP to recieve changes
+  ansible.builtin.pause:
+    minutes: 4
+  when: "'no change' not in insecure_patch.stdout"
+
+# - name: Waiting Until Openshift Cluster is Ready from Patch
+#   ansible.builtin.shell: |
+#     oc get mcp -o json | jq '.items[] | select (.status.machineCount==.status.updatedMachineCount)'
+#   register: mcp_result
+#   delay: 10
+#   retries: 15
+#   until:
+#     - mcp_result.stdout != ""
+#   when: "'no change' not in insecure_patch.stdout"
