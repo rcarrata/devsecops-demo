@@ -1,0 +1,13 @@
+kind: ImageStream
+apiVersion: image.openshift.io/v1
+metadata:
+  name: cosign-pod
+  namespace: {{ pipeline_namespace }}
+  labels:
+    build: cosign-pod
+spec:
+  lookupPolicy:
+    local: false
+status:
+  dockerImageRepository: >-
+    image-registry.openshift-image-registry.svc:5000/{{ pipeline_namespace }}/cosign-pod

@@ -1,0 +1,62 @@
+kind: BuildConfig
+apiVersion: build.openshift.io/v1
+metadata:
+  name: cosign-pod
+  namespace: {{ pipeline_namespace }}
+  labels:
+    build: cosign-pod
+spec:
+  nodeSelector: null
+  output:
+    to:
+      kind: ImageStreamTag
+      name: 'cosign-pod:latest'
+  resources: {}
+  successfulBuildsHistoryLimit: 5
+  failedBuildsHistoryLimit: 5
+  strategy:
+    type: Docker
+    dockerStrategy:
+      from:
+        kind: ImageStreamTag
+        name: 'ubi:8.0'
+  postCommit: {}
+  source:
+    type: Dockerfile
+    dockerfile: >-
+      FROM registry.redhat.io/ubi8/ubi:8.0
+
+
+      RUN yum install go git wget tar rsync -y && wget
+      https://github.com/sigstore/cosign/releases/download/v1.9.0/cosign-1.9.0.x86_64.rpm
+      \
+          && yum localinstall -y cosign-1.9.0.x86_64.rpm \
+          && wget https://mirror.openshift.com/pub/openshift-v4/x86_64/clients/ocp/stable/openshift-client-linux.tar.gz \
+          && tar -xvf openshift-client-linux.tar.gz && mv oc /usr/local/bin \
+          && rm -rf openshift-client-linux.tar.gz \
+          && rm -rf cosign-1.9.0.x86_64.rpm \
+          && mkdir /.docker \
+          && mkdir -p /tekton/home \
+          && mkdir /workdir
+
+      USER 0
+
+      RUN chgrp -R 0 /usr/bin && \
+          chmod -R g=u /usr/bin && \
+          chgrp -R 0 /.docker && \
+          chmod -R g=u /.docker && \
+          chgrp -R 0 /tekton/home && \
+          chmod -R g=u /tekton/home && \
+          chgrp -R 0 /workdir && \
+          chmod -R g=u /workdir
+
+      WORKDIR /workdir
+
+      USER 1001
+      
+      ENTRYPOINT cosign
+  triggers:
+    - type: ConfigChange
+    - type: ImageChange
+      imageChange: {}
+  runPolicy: Serial

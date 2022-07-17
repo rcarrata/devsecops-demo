@@ -1,0 +1,28 @@
+tekton_chain_keys:
+  "artifacts.oci.storage": ""
+  "artifacts.taskrun.format": "tekton"
+  "artifacts.taskrun.storage": "tekton"
+  "artifacts.oci.signer": "x509"
+  "artifacts.oci.format": "simplesigning"
+#tekton_operator_namespace: openshift-pipelines
+pipeline_namespace: cicd
+dev_namespace: devsecops-dev
+qa_namespace: devsecops-qa
+tekton_operator_namespace: tekton-chains
+tekton_chain_version: 'v0.10.0'
+tekton_install_type: manifest
+cosign_image: "image-registry.openshift-image-registry.svc:5000/{{ pipeline_namespace }}/cosign-pod:latest"
+#cosign_image: "gcr.io/projectsigstore/cosign:v1.9.0"
+secret_generate_name: signing-secrets
+stackrox_central_admin_password: stackrox
+quay_secret_name: quay-robot-secret
+quay_registry_name: demo-registry
+quay_org_name: cicd-demo
+quay_project_name: quay-demo
+quay_repositories:
+  - spring-petclinic-dev
+  - spring-petclinic-stage
+secret_required_namespaces:
+  - cicd
+  - devsecops-dev
+  - devsecops-qa

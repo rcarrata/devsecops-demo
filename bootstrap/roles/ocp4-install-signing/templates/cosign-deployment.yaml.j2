@@ -1,0 +1,28 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cosign-pod
+  namespace: {{ pipeline_namespace }}
+spec:
+  selector:
+    matchLabels:
+      app: cosign-pod
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: cosign-pod
+    spec:
+      containers:
+        - name: cosign-pod
+          image: {{cosign_image}}
+          env:
+            - name: COSIGN_PASSWORD
+              value: {{ cosign_password }}
+          command: 
+            - '/bin/bash'
+          args:
+            - -c             
+            - sleep infinity
+      serviceAccountName: pipeline
+      serviceAccount: pipeline

@@ -1,0 +1,21 @@
+kind: ImageStream
+apiVersion: image.openshift.io/v1
+metadata:
+  name: ubi
+  namespace: {{ pipeline_namespace }}
+  labels:
+    build: cosign-pod
+spec:
+  lookupPolicy:
+    local: false
+  tags:
+    - name: '8.0'
+      annotations:
+        openshift.io/imported-from: 'registry.redhat.io/ubi8/ubi:8.0'
+      from:
+        kind: DockerImage
+        name: 'registry.redhat.io/ubi8/ubi:8.0'
+      generation: 2
+      importPolicy: {}
+      referencePolicy:
+        type: Source

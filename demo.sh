@@ -20,7 +20,7 @@ err() {
 
 while (( "$#" )); do
   case "$1" in
-    start|promote|status)
+    start|promote|status|sign-verify)
       COMMAND=$1
       shift
       ;;
@@ -48,6 +48,7 @@ command.help() {
       start                          Starts the deploy DEV pipeline
       promote                        Starts the deploy STAGE pipeline
       status                         Check the resources available for the demo
+      sign-verify                    If Tekton Chaining was enabled run Signature Verification On Tasks
       help                           Help about this command
 EOF
 }
@@ -99,6 +100,51 @@ command.promote() {
     OCP_ROUTE=$(oc whoami --show-console)
     info "Check the pipeline in: \n$OCP_ROUTE/pipelines/ns/cicd/pipeline-runs"
     echo ""
+}
+
+command.sign-verify() {
+    info "## Will attempt to verify TaskRuns of Last Pipelinerun"
+    tekton_chain_namespaces=("cicd")
+    working_namespace=""
+    verify_script="verify-pipeline.sh"
+
+    for namespace in ${tekton_chain_namespaces[@]}
+    do 
+      pod_check=$(oc get pods -n $namespace -l app=cosign-pod 2>&1)
+      if echo ${pod_check} | grep -iv "No resources found"
+      then
+        working_namespace=$namespace
+        cosign_pod=$(oc get pods -n $namespace -l app=cosign-pod --sort-by=.metadata.creationTimestamp | tail -n 1| awk '{print $1}')
+      fi
+    done    
+
+    if [ -z "${cosign_pod:-}" ]    
+    then
+      info "## Cosign Pod not Found,Please make sure to run the deploy_signing.yaml"
+      exit 1
+    else
+      info "## Cosign Pod(${cosign_pod}) found in namespace:${namespace}"
+    fi
+    
+    info "## Copying Verification Script to Cosign Pod(${cosign_pod})"
+    oc rsync --include=${verify_script} -n $working_namespace ./run/verify $cosign_pod:/workdir > /dev/null
+    
+    info "## Attemtpting to run verification script in Pod(${cosign_pod})"
+    oc exec pod/"$cosign_pod" -n $working_namespace -- /bin/bash -c "chmod ugo+x /workdir/verify/${verify_script}"
+    oc exec pod/"$cosign_pod" -n $working_namespace -- /bin/bash -c "/workdir/verify/${verify_script} $working_namespace "
+
+    # echo "Obtaining cosign.key"
+    # oc exec pod/"$cosign_pod" -n openshift-pipelines -- /bin/bash -c "oc get secret/signing-secrets -n openshift-pipelines -o jsonpath='{.data.cosign\.key}' | base64 -d > /test/cosign.key"
+    # echo "Obtaining cosign.password"
+    # oc exec pod/"$cosign_pod" -n openshift-pipelines -- /bin/bash -c "oc get secret/signing-secrets -n openshift-pipelines -o jsonpath='{.data.cosign\.password}' | base64 -d > /test/cosign.password"
+    # echo "Obtaining cosign public key"
+    # oc exec pod/"$cosign_pod" -n openshift-pipelines -- /bin/bash -c "oc get secret/signing-secrets -n openshift-pipelines -o jsonpath='{.data.cosign\.pub}' | base64 -d > /test/cosign.pub"
+    
+    
+    # signature=$(oc get taskrun/petclinic-build-dev-z8zq7v-build-image -n cicd -o jsonpath='{.metadata.annotations.chains\.tekton\.dev/signature-taskrun-171087b9-512e-4237-ab70-6f01083e9170}')
+    # payload=$(oc get taskrun/petclinic-build-dev-z8zq7v-build-image -n cicd -o jsonpath='{.metadata.annotations.chains\.tekton\.dev/payload-taskrun-171087b9-512e-4237-ab70-6f01083e9170}')
+    
+    # oc run cosign-verify --image=gcr.io/projectsigstore/cosign:v1.9.0 -- verify --key $cosign_key --signature $signature $payload
 }
 
 main() {

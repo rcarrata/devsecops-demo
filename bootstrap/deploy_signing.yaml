@@ -1,0 +1,18 @@
+---
+- name: 'Extend Original Demo for Image and TaskRun Signing'
+  hosts: localhost
+  connection: local
+  tasks:
+    - name: 'Install NooBaa'
+      include_role:
+        name: "ocp4-install-noobaa"
+
+    - name: 'Install and configure Quay'
+      include_role:
+        name: "ocp4-install-quay"
+
+    - name: 'Install and Enable the infra for Signing and Tekton Chaining'
+      include_role:
+        name: "ocp4-install-signing"
+
+    

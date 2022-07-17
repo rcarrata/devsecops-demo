@@ -1,0 +1,29 @@
+quay_project_name: quay-demo
+quay_admin_username: quayadmin
+quay_admin_email: quayadmin@redhat.com
+quay_admin_password: quaypass123
+quay_registry_name: demo-registry
+quay_org_name: cicd-demo
+quay_secret_name: quay-robot-secret
+quay_repositories:
+  - spring-petclinic-dev
+  - spring-petclinic-stage
+quay_robot_account: demo_robot
+pipeline_namespace: cicd
+csrf_pattern: ".*window.__token\ =\ '(.*)';.*"
+#Can obtain status codes from Swagger of quay route/api/v1/discovery
+quay_user_found_success_status_code: 200
+quay_org_not_found_error_code: 404
+quay_org_found_success_status_code: 200
+quay_org_created_success_status_code: 201
+quay_repo_not_found_error_code: 404
+quay_repo_found_success_status_code: 200
+quay_repo_created_success_status_code: 201
+quay_robot_not_found_error_code: 400
+quay_robot_found_success_status_code: 200
+quay_robot_created_success_status_code: 201
+quay_perm_success_status_code: 200
+secret_required_namespaces:
+  - cicd
+  - devsecops-dev
+  - devsecops-qa

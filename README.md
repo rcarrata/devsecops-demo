@@ -11,11 +11,11 @@ DevSecOps CICD pipeline demo using several technologies such as:
 
 Vulnerability and configuration management methods included in this demo are the following:
 
-* **Static application security testing (SAST)**, which analyzes code under development for vulnerabilities and quality issues.
-* **Software composition analysis (SCA)**, which examines dependent packages included with applications, looking for known vulnerabilities and licensing issues.
-* **Interactive application security testing (IAST)** and **dynamic application security testing (DAST)** tools, which analyze running applications to find execution vulnerabilities.
-* **Configuration management** with analysis and management of application and infrastructure configurations in DevOps. Traditionally this was not used as a way to improve security. But properly managing configurations in a GitOps process can strengthen security by improving change controls, identifying configuration defects that can reduce the attack surface, and signing and tracking authorship for better accountability and opportunities to improve.
-* **Image risk** is any risk associated with a container image. This includes vulnerable dependencies, embedded secrets, bad configurations, malware, or images that are not trusted.
+- **Static application security testing (SAST)**, which analyzes code under development for vulnerabilities and quality issues.
+- **Software composition analysis (SCA)**, which examines dependent packages included with applications, looking for known vulnerabilities and licensing issues.
+- **Interactive application security testing (IAST)** and **dynamic application security testing (DAST)** tools, which analyze running applications to find execution vulnerabilities.
+- **Configuration management** with analysis and management of application and infrastructure configurations in DevOps. Traditionally this was not used as a way to improve security. But properly managing configurations in a GitOps process can strengthen security by improving change controls, identifying configuration defects that can reduce the attack surface, and signing and tracking authorship for better accountability and opportunities to improve.
+- **Image risk** is any risk associated with a container image. This includes vulnerable dependencies, embedded secrets, bad configurations, malware, or images that are not trusted.
 
 This pipeline also improve security adding the following Open Source components:
 
@@ -95,6 +95,38 @@ These policies notification can be enabled by each system policy enabled in our 
 
 NOTE: By now the integration is manual. WIP to automate it.
 
+## 6. Image Signing and Pipeline Signing
+
+The original demo can be extended to use Cosign to Sign Image artifacts and also to sign the Tekton Build Pipeline via Tekton [Chaining](https://github.com/tektoncd/chains).
+
+To extend the pipeline run the extend.sh script
+
+```sh
+   ./extend.sh
+```
+
+This will install Noobaa(Object Storage), Quay, and create a pod for cosign secret generation and verification.It will also install the tekton chains operator and integrate with ACS policies to generate violations for non signed images.
+
+After installation the pipeline will build images to quay and have a task that signs the image.  
+<img align="center" width="750" src="docs/pics/pipeline-with-sign-task.png">
+
+We also create a policy in ACS that will generate a violation for every unsigned image
+<img align="center" width="750" src="docs/pics/acs-trusted-signature-violation.png">
+
+Pipeline can be run normally via the Run the demo Instructions below.
+
+After Pipeline is run Quay will show the image signed by Cosign
+<img align="center" width="750" src="docs/pics/quay-with-signatures.png">
+
+Since we have Tekton Chaining enabled, successfully completed Taskruns will also be annotated with cosign signatures and payload information.
+<img align="center" width="750" src="docs/pics/taskrun.png">
+
+And we can verify the signature and payload information of our last successful pipelinerun using the below command.
+
+```sh
+   ./demo.sh sign-verify
+```
+
 ## Security Policies and CI Violations
 
 In this demo, we can control the security policies applied into our pipelines, scanning the images and analysing the different deployments templates used for deploy our applications.
@@ -114,9 +146,10 @@ This ensures that we have the total control of our pipelines, and no image is pu
 To show a complete demo and show the transition from a "bad image" to an image that passes the build enforcement, we can update the Tekton task of the image build and fix the image. In this example, we will be enabling the enforcement of the "Red Hat Package Manager in Image" policy in ACS, which will fail our pipeline at the image-check as both `yum` and `rpm` package managers are present in our base image.
 
 Update the tekton task:
+
 1. Delete the `s2i-java-11` task
-    1. With the UI: From the OpenShift UI, make sure you are in the cicd project and then go to Pipelines > Tasks and delete the `s2i-java-11` task.
-    2. With the Tekton cli `tkn task delete s2i-java-11`
+   1. With the UI: From the OpenShift UI, make sure you are in the cicd project and then go to Pipelines > Tasks and delete the `s2i-java-11` task.
+   2. With the Tekton cli `tkn task delete s2i-java-11`
 2. Apply the new update task: `kubectl apply -f fix-image/s2ijava-mgr.yaml`
 3. Re-run the pipeline, your deployment now succeeds.
 
@@ -188,20 +221,20 @@ NOTE: This pipeline will fail if you don't [disable the "Fixable at least Import
 
 ## Quick Video with the Demo
 
-* [Option I - Complete CICD End2End process (Success)](https://youtu.be/uA7nUYchY5Q)
+- [Option I - Complete CICD End2End process (Success)](https://youtu.be/uA7nUYchY5Q)
 
-* [Option II - Failure CICD pipeline due to the ACS violation policy](https://youtu.be/jTRImofd6wQ?t=380)
+- [Option II - Failure CICD pipeline due to the ACS violation policy](https://youtu.be/jTRImofd6wQ?t=380)
 
-* [Openshift Coffee Break - ACS for Kubernetes - DevSecOps Way](https://youtu.be/43Mr30mXq0I?t=1955)
+- [Openshift Coffee Break - ACS for Kubernetes - DevSecOps Way](https://youtu.be/43Mr30mXq0I?t=1955)
 
 ## Promote Pipeline and Triggers
 
-* [Promote Pipeline](docs/promote.md)
-* [Triggers in Dev Pipeline](doc/triggers.md)
+- [Promote Pipeline](docs/promote.md)
+- [Triggers in Dev Pipeline](doc/triggers.md)
 
 # Troubleshooting
 
-* [Check the Tshoot section](docs/tshoot.md)
+- [Check the Tshoot section](docs/tshoot.md)
 
 # Credits
 

@@ -1,0 +1,6 @@
+- import_tasks: build-cosign-infra.yaml
+- import_tasks: add-cosign-secret-acs.yaml
+- import_tasks: tektonchain.yaml
+- import_tasks: patch-pipeline.yaml
+
+

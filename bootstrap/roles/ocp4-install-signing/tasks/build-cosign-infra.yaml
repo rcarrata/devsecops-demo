@@ -1,0 +1,78 @@
+- name: Create OpenShift Objects to build a pod to run Cosign Binary
+  k8s:
+    state: present
+    definition: "{{ lookup('template', item ) | from_yaml }}"
+  loop:
+  - ./templates/cosign-ubi-is.yaml.j2
+  - ./templates/cosign-is.yaml.j2
+  - ./templates/cosign-build.yaml.j2
+ 
+- name: Wait Until cosign build is complete
+  shell: |
+    oc get build -l build=cosign-pod -n "{{ pipeline_namespace }}" --sort-by=.metadata.creationTimestamp | tail -n 1 | awk '{print $4}'
+  register: build_status
+  retries: 10
+  delay: 20
+  until:
+    - build_status.stdout == "Complete"
+
+# - name: Make Sure Any Previously Generated Secrets are Absent
+#   kubernetes.core.k8s:
+#     state: absent
+#     api_version: v1
+#     kind: Secret
+#     namespace: "{{ pipeline_namespace }}"
+#     name: "{{ secret_generate_name }}"
+#     wait: yes
+
+- name: Generate Random Cosign Password 
+  set_fact:
+    cosign_password: "{{ lookup('password', '/dev/null chars=ascii_lowercase,digits length=6') }}"
+
+- name: Create OpenShift Objects for Cosign Usage
+  k8s:
+    state: present
+    definition: "{{ lookup('template', item ) | from_yaml }}"
+  loop:
+#  - ./templates/cosign-serviceaccount.yaml.j2
+  - ./templates/cosign-role.yaml.j2
+  - ./templates/cosign-rolebinding.yaml.j2
+  - ./templates/cosign-rolebinding-cicd.yaml.j2
+  - ./templates/cosign-deployment.yaml.j2
+
+- name: Wait till Cosign Deployment is Ready
+  k8s_info:
+      kind: Deployment
+      name: cosign-pod
+      namespace: "{{ pipeline_namespace }}"
+  register: output_info
+  until: output_info.resources | json_query('[*].status.conditions[?reason==`NewReplicaSetAvailable`][].status') | select ('match','True') | list | length == 1
+  delay: 5
+  retries: 5
+
+- name: Get Cosign Pod Name
+  shell: |
+    oc get pods -n "{{ pipeline_namespace }}" -l app=cosign-pod --sort-by=.metadata.creationTimestamp | tail -n 1| awk '{print $1}'
+  register: pod_name
+
+- name: Check if Cosign Signing Secret Already Exists
+  k8s_info:
+      kind: Secret
+      name: "{{ secret_generate_name }}"
+      namespace: "{{ pipeline_namespace }}"
+  register: secret_check_status
+
+- name: Create Cosign Secret
+  shell: |
+    oc exec pod/"{{ pod_name.stdout }}" -n "{{ pipeline_namespace }}" -- /bin/bash -c 'cosign generate-key-pair k8s://"{{ pipeline_namespace }}"/"{{ secret_generate_name }}"'
+  when:
+    secret_check_status.resources | length<1
+
+- name: Confirm Cosign Secret is Created
+  kubernetes.core.k8s:
+    state: present
+    api_version: v1
+    kind: Secret
+    namespace: "{{ pipeline_namespace }}"
+    name: "{{ secret_generate_name }}"
+    wait: yes

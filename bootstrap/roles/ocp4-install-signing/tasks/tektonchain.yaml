@@ -1,0 +1,94 @@
+- name: Delete Operator Namespace if it Exists
+  kubernetes.core.k8s:
+    state: absent
+    api_version: project.openshift.io/v1
+    kind: Project
+    name: "{{ tekton_operator_namespace }}"
+    wait: yes
+
+#Tekton Manifest Based Installation -https://github.com/tektoncd/chains#installation
+- name: Install Tekton Chains via Manifest
+  shell: |
+    oc apply -f https://storage.googleapis.com/tekton-releases/chains/previous/"{{ tekton_chain_version }}"/release.yaml
+  when: tekton_install_type == "manifest"
+
+#Tekton CR Based Installation - https://docs.openshift.com/container-platform/4.10/cicd/pipelines/using-tekton-chains-for-openshift-pipelines-supply-chain-security.html
+- name: Install Tekton Chains via Pipeline CR
+  k8s:
+    state: present
+    definition: "{{ lookup('template', item ) | from_yaml }}"
+  loop:
+  - ./templates/tektonchain-cr.yaml.j2
+  when: tekton_install_type != "manifest"
+
+- name: Apply TektonChain Controller SCC
+  shell: |
+    oc project {{ tekton_operator_namespace }} && oc adm policy add-scc-to-user nonroot -z tekton-chains-controller
+
+# Wait Until TektonChain Controller Pod Is Ready
+- name: Get TektonChain Pod
+  kubernetes.core.k8s_info:
+    kind: Pod
+    api_version: v1
+    namespace: "{{ tekton_operator_namespace }}"
+    label_selectors:
+     - app = tekton-chains-controller
+    wait: yes
+  retries: 3
+  delay: 20
+
+# - name: Check if Cosign Signing Secret Already Exists in Operator Namespace
+#   k8s_info:
+#       kind: Secret
+#       name: "{{ secret_generate_name }}"
+#       namespace: "{{ tekton_operator_namespace }}"
+#   register: secret_check_status_operator
+
+- name: Delete Cosign Secret if exists
+  kubernetes.core.k8s:
+    state: absent
+    api_version: v1
+    kind: Secret
+    namespace: "{{ tekton_operator_namespace }}"
+    name: "{{ secret_generate_name }}"
+    wait: yes
+
+- name: Check if Cosign Signing Secret Already Exists in Pipeline Namespace
+  k8s_info:
+      kind: Secret
+      name: "{{ secret_generate_name }}"
+      namespace: "{{ pipeline_namespace }}"
+  register: secret_check_status_pipeline
+
+- name: Print Secret from Pipeline Namespace if it Exists
+  ansible.builtin.debug:
+    msg: "{{ secret_check_status_pipeline.resources }}"
+
+- name: Copy Secret from Pipeline Namespace if it Exists
+  ansible.builtin.shell: |
+    oc get secret {{ secret_generate_name }} -n {{ pipeline_namespace }} -o json | jq 'del(.metadata.namespace,.metadata.resourceVersion,.metadata.uid,.metadata.selfLink,.metadata.managedFields,.metadata.annotations."kubectl.kubernetes.io/last-applied-configuration") | .metadata.creationTimestamp=null | .metadata.name="{{ secret_generate_name }}"'| oc apply -n {{ tekton_operator_namespace }} -f -
+  when: 
+  - secret_check_status_pipeline.resources | default([]) | length>0
+
+- name: Create Cosign Secret
+  shell: |
+    oc exec pod/"{{ pod_name.stdout }}" -n "{{ pipeline_namespace }}" -- /bin/bash -c 'cosign generate-key-pair k8s://"{{ pipeline_namespace }}"/"{{ secret_generate_name }}"'
+  when: 
+  - secret_check_status_pipeline.resources | default([]) | length<1 
+  
+- name: Confirm Cosign Secret is Created
+  kubernetes.core.k8s:
+    state: present
+    api_version: v1
+    kind: Secret
+    namespace: "{{ pipeline_namespace }}"
+    name: "{{ secret_generate_name }}"
+    wait: yes
+
+- name: Patch the CM of Openshift Piplines to enable Tekton Chains
+  command: oc patch configmap chains-config -n {{ tekton_operator_namespace }} -p='{"data":{'\"{{ item.key }}\"':'\"{{ item.value }}\"'}}'
+  loop: "{{ tekton_chain_keys | dict2items }}"
+
+- name: Recreate Tekton Chain Controller
+  shell: |
+    oc delete po -l app=tekton-chains-controller -n "{{ tekton_operator_namespace }}"

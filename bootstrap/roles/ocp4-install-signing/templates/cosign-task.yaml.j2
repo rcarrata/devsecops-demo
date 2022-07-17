@@ -1,0 +1,36 @@
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: cosign-task
+  namespace: {{ pipeline_namespace }}
+  labels:
+    app.kubernetes.io/version: "0.6"
+  annotations:
+    tekton.dev/pipelines.minVersion: "0.17.0"
+    tekton.dev/categories: security
+    tekton.dev/tags: security
+    tekton.dev/displayName: "Sign and Verify Images"
+    tekton.dev/platforms: "linux/amd64"
+spec:
+  description: >-
+    This Task can be used to sign an image in a registry
+  params:
+    - name: IMAGE
+      description: Name (reference) of the cosign image
+    - name: SIGNATURE_IMAGE
+      description: Image to be signed
+    - name: ARGS
+      type: array
+      description: args to pass to cosign command to 
+      default: []
+  steps:
+    - name: cosign-actions
+      image: $(params.IMAGE)
+      script: |
+        #!/usr/bin/env bash
+        cmd="cosign $* $(params.SIGNATURE_IMAGE)"
+        echo "Starting Image Signing Task"
+        echo "This is the command we will run $cmd"
+        $cmd
+      args:
+        - "$(params.ARGS)"

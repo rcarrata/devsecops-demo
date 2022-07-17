@@ -1,0 +1,125 @@
+- name: Get cluster version
+  k8s_info:
+    api_version: config.openshift.io/v1
+    kind: ClusterVersion
+    name: version
+  register: r_cluster_version
+
+- name: Set ocp4_cluster_version fact
+  set_fact:
+    ocp4_cluster_version: "{{ r_cluster_version.resources[0].status.history[0].version }}"
+
+- name: Obtain Channel from Version
+  set_fact:
+    ocp4_channel: "{{ ocp4_cluster_version.split('.') }}"
+
+- name: Set Openshift Channel
+  set_fact:
+    ocp4_channel: "stable-{{ ocp4_channel[0] + '.' + ocp4_channel[1] }}"
+
+- name: Print OpenShift version
+  debug:
+    msg: "{{ ocp4_channel }}"
+
+- name: Adapt to the openshift_cluster_version LESS than 4.9
+  when: ocp4_cluster_version is version_compare('4.9', '<')
+  block:
+    - name: Create OpenShift Objects to install Noobaa
+      k8s:
+        state: present
+        definition: "{{ lookup('template', item ) | from_yaml }}"
+      loop:
+      - ./templates/odf-namespace.yaml.j2
+      - ./templates/operatorgroup-storage.yaml.j2
+      - ./templates/ocs-subscription.yaml.j2
+
+    - name: Wait for NooBaa CRD to exist
+      kubernetes.core.k8s_info:
+        api_version: "apiextensions.k8s.io/v1beta1"
+        kind: CustomResourceDefinition
+        name: "noobaas.noobaa.io"
+      register: crds
+      until: crds.resources|length > 0
+      retries: 30
+      delay: 10
+
+- name: Adapt to the openshift_cluster_version MORE than 4.9
+  when: ocp4_cluster_version is version_compare('4.9', '>=')
+  block:
+    - name: Create OpenShift Objects to install Noobaa
+      k8s:
+        state: present
+        definition: "{{ lookup('template', item ) | from_yaml }}"
+      loop:
+      - ./templates/odf-namespace.yaml.j2
+      - ./templates/operatorgroup-storage.yaml.j2
+      - ./templates/odf-subscription.yaml.j2
+
+    - name: Wait for NooBaa CRD to exist
+      kubernetes.core.k8s_info:
+        api_version: "apiextensions.k8s.io/v1"
+        kind: CustomResourceDefinition
+        name: "noobaas.noobaa.io"
+      register: crds
+      until: crds.resources|length > 0
+      retries: 30
+      delay: 10
+
+- name: Create Noobaa Object
+  k8s:
+    state: present
+    definition: "{{ lookup('template', item ) | from_yaml }}"
+  loop:
+  - ./templates/noobaa-object.yaml.j2
+
+- name: Wait Until NooBaa Object is Ready
+  shell: |
+    oc get noobaas.noobaa.io/noobaa -n openshift-storage -o jsonpath='{.status.phase}'
+  register: noobaa_status
+  retries: 10
+  delay: 20
+  until:
+    - noobaa_status.stdout == "Ready"
+
+- name: Get Default Openshift Storage Class
+  shell: |
+    oc get sc -o=jsonpath='{.items[?(@.metadata.annotations.storageclass\.kubernetes\.io/is-default-class=="true")].metadata.name}'
+  register: default_openshift_storage_class
+  when: noobaa_storage_class == ""
+
+- name: Get any other Storage Class
+  shell: |
+    oc get sc -o name | head -n 1 | cut -d "/" -f2
+  register: other_openshift_storage_class
+  when: (default_openshift_storage_class.stdout |default("") == "" ) and (noobaa_storage_class == "")
+
+- name: Use default storage class if it was set
+  ansible.builtin.set_fact:
+    noobaa_storage_class: "{{ default_openshift_storage_class.stdout }}"
+  when: (default_openshift_storage_class.stdout |default("") != "" ) and (noobaa_storage_class == "")
+
+- name: Try other possible storage class if no defined/default storage class
+  ansible.builtin.set_fact:
+    noobaa_storage_class: "{{ other_openshift_storage_class.stdout }}"
+  when: (default_openshift_storage_class.stdout |default("") == "" ) and (noobaa_storage_class == "") and (other_openshift_storage_class|default("") != "")
+
+- name: Create NooBaa Backing Store
+  k8s:
+    state: present
+    definition: "{{ lookup('template', item ) | from_yaml }}"
+  loop:
+  - ./templates/noobaa-backingstore.yaml.j2
+
+- name: Wait Until NooBaa Object is Ready
+  shell: |
+    oc get BackingStore/"{{ backing_store_name }}" -n openshift-storage -o jsonpath='{.status.phase}'
+  register: backing_store
+  retries: 10
+  delay: 20
+  until:
+    - backing_store.stdout == "Ready"
+
+- name: Patch Bucket Class with Backing Store
+  shell: |
+    oc patch bucketclass noobaa-default-bucket-class --patch '{"spec":{"placementPolicy":{"tiers":[{"backingStores":["{{backing_store_name}}"]}]}}}' --type merge -n openshift-storage
+  
