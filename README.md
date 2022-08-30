@@ -167,7 +167,7 @@ You can check the `s2ijava-mgr.yaml` file for more details. We have added a step
 
 * [Install Ansible](https://docs.ansible.com/ansible/latest/installation_guide/intro_installation.html#installing-ansible-on-rhel-centos-or-fedora)
 
-* [Install Kubernetes Ansible Module](https://docs.ansible.com/ansible/latest/collections/community/kubernetes/k8s_module.html)
+* [Install Kubernetes Ansible Module](https://docs.ansible.com/ansible/latest/collections/kubernetes/core/k8s_module.html)
 
 ```sh
 ansible-galaxy collection install community.kubernetes
