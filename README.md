@@ -1,6 +1,7 @@
 # DevSecOps Pipeline Demo
 
-<img align="center" width="750" src="docs/pics/demo_overview.png">
+[![Watch the video](https://github.com/rcarrata/devsecops-demo/blob/main/docs/pics/demo_overview.png)]([https://youtu.be/vt5fpE0bzSY](https://www.youtube.com/watch?v=uA7nUYchY5Q&ab_channel=RobertoCarratal%C3%A1))
+**NOTE**: Watch the end2end demo clicking the DevSecOps demo image above!
 
 DevSecOps CICD pipeline demo using several technologies such as:
 
@@ -28,6 +29,8 @@ This pipeline also improve security adding the following Open Source components:
 - [Zap Proxy](https://www.zaproxy.org/)
 
 * NOTE: Tested and fully working for 4.7+ OpenShift Clusters, including >=4.9!
+
+
 
 # Overview
 
