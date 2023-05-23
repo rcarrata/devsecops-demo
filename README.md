@@ -1,6 +1,6 @@
 # DevSecOps Pipeline Demo
 
-[![Watch the video](https://github.com/rcarrata/devsecops-demo/blob/main/docs/pics/demo_overview.png)(https://youtu.be/vt5fpE0bzSY](https://www.youtube.com/watch?v=uA7nUYchY5Q&ab_channel=RobertoCarratal%C3%A1)
+[![Watch the video](https://github.com/rcarrata/devsecops-demo/blob/main/docs/pics/demo_overview.png)](https://www.youtube.com/watch?v=uA7nUYchY5Q&ab_channel=RobertoCarratal%C3%A1)
 **NOTE**: Watch the end2end demo clicking the DevSecOps demo image above!
 
 DevSecOps CICD pipeline demo using several technologies such as:
