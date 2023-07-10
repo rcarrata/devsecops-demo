@@ -47,6 +47,39 @@
         namespace: "{{ ocp4_demo_pipeline_namespace }}"
       type: Opaque
 
+# - name: Get Service Account objects
+#   kubernetes.core.k8s_info:
+#     kind: ServiceAccount
+#     api_version: /v1
+#     name: pipeline
+#     namespace: cicd
+#   register: r_argopass
+
+# - name: Get the secret that contains the token of sa pipeline
+#   set_fact:
+#     token_sa_pipeline_secret: "{{ r_argopass.resources[0].secrets | to_json | from_json | json_query(query) }}"
+#   vars:
+#     query: >-
+#       [?contains(name,'token')].name
+
+# # - debug:
+# #     msg: "{{ token_sa_pipeline_secret }}"
+
+# - name: Get token in the secret for the sa pipeline and decode
+#   kubernetes.core.k8s_info:
+#     kind: Secret
+#     api_version: /v1
+#     name: "{{ token_sa_pipeline_secret[0] | replace(\"'\",'') }}"
+#     namespace: cicd
+#   register: r_token_sa_secret
+
+# # - debug:
+# #     msg: "{{ r_token_sa_secret.resources[0].data.token | b64decode }}"
+
+# - name: define the token secret decoded
+#   set_fact:
+#     pipeline_token: "{{ r_token_sa_secret.resources[0].data.token | b64decode }}"
+
 - name: Get Service Account objects
   kubernetes.core.k8s_info:
     kind: ServiceAccount
@@ -55,30 +88,19 @@
     namespace: cicd
   register: r_argopass
 
-- name: Get the secret that contains the token of sa pipeline
-  set_fact:
-    token_sa_pipeline_secret: "{{ r_argopass.resources[0].secrets | to_json | from_json | json_query(query) }}"
-  vars:
-    query: >-
-      [?contains(name,'token')].name
+- name: lets do it with shell
+  shell: "oc describe sa pipeline -n cicd | grep Tokens | awk '{print$2}'"
+  register: r_argopass
 
-#- debug:
-#    msg: "{{ token_sa_pipeline_secret }}"
+- set_fact:
+    r_argopass: "{{ r_argopass.stdout }}"
 
-- name: Get token in the secret for the sa pipeline and decode
-  kubernetes.core.k8s_info:
-    kind: Secret
-    api_version: /v1
-    name: "{{ token_sa_pipeline_secret[0] | replace(\"'\",'') }}"
-    namespace: cicd
-  register: r_token_sa_secret
+- name: pulling secret and base64 decoding it
+  shell: oc get secret {{ r_argopass }} -n cicd -o jsonpath='{.data.token}' | base64 -d
+  register: pipeline_token
 
-#- debug:
-#    msg: "{{ r_token_sa_secret.resources[0].data.token | b64decode }}"
-
-- name: define the token secret decoded
-  set_fact:
-    pipeline_token: "{{ r_token_sa_secret.resources[0].data.token | b64decode }}"
+- set_fact:
+    pipeline_token: "{{ pipeline_token.stdout }}"
 
 - name: Creating ACS Integration with the Openshift Internal Registry
   uri:

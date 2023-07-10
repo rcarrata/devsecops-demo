@@ -11,7 +11,7 @@
   shell: |
     oc get build -l build=cosign-pod -n "{{ pipeline_namespace }}" --sort-by=.metadata.creationTimestamp | tail -n 1 | awk '{print $4}'
   register: build_status
-  retries: 10
+  retries: 20
   delay: 20
   until:
     - build_status.stdout == "Complete"

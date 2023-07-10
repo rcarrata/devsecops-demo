@@ -76,7 +76,7 @@
   shell: |
     oc get noobaas.noobaa.io/noobaa -n openshift-storage -o jsonpath='{.status.phase}'
   register: noobaa_status
-  retries: 10
+  retries: 20
   delay: 20
   until:
     - noobaa_status.stdout == "Ready"
