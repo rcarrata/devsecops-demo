@@ -47,34 +47,37 @@
         namespace: "{{ ocp4_demo_pipeline_namespace }}"
       type: Opaque
 
-- name: Get Service Account objects
+- name: Get secrets in namespace
   kubernetes.core.k8s_info:
-    kind: ServiceAccount
-    api_version: /v1
-    name: pipeline
+    api_version: v1
+    kind: Secret
     namespace: cicd
-  register: r_argopass
+  register: secrets_info
 
-- name: Get the secret that contains the token of sa pipeline
+#- name: Debug secrets_info variable
+#  debug:
+#    var: secrets_info
+
+- name: Extract secret name using regex
   set_fact:
-    token_sa_pipeline_secret: "{{ r_argopass.resources[0].secrets | to_json | from_json | json_query(query) }}"
+    secret_name: "{{ secrets_info.resources | map(attribute='metadata.name') | select('match', regex) | list | first }}"
   vars:
-    query: >-
-      [?contains(name,'token')].name
+    regex: ".*pipeline-token.*"
 
-#- debug:
-#    msg: "{{ token_sa_pipeline_secret }}"
+- name: Display secret name
+  debug:
+    var: secret_name
 
 - name: Get token in the secret for the sa pipeline and decode
   kubernetes.core.k8s_info:
     kind: Secret
     api_version: /v1
-    name: "{{ token_sa_pipeline_secret[0] | replace(\"'\",'') }}"
+    name: "{{ secret_name }}"
     namespace: cicd
   register: r_token_sa_secret
 
-#- debug:
-#    msg: "{{ r_token_sa_secret.resources[0].data.token | b64decode }}"
+- debug:
+    msg: "{{ r_token_sa_secret.resources[0].data.token | b64decode }}"
 
 - name: define the token secret decoded
   set_fact:
