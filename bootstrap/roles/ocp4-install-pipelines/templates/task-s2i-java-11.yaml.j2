@@ -1,12 +1,12 @@
 apiVersion: tekton.dev/v1beta1
 kind: Task
 metadata:
-  name: s2i-java-11
-  namespace: cicd
   annotations:
     tekton.dev/displayName: s2i java 11
     tekton.dev/pipelines.minVersion: 0.11.3
     tekton.dev/tags: 's2i, java, workspace'
+  name: s2i-java-11
+  namespace: cicd
 spec:
   description: >-
     s2i-java-11 task clones a Git repository and builds and pushes a container
@@ -37,14 +37,14 @@ spec:
     - description: Location of the repo where image has to be pushed
       name: IMAGE_NAME
       type: string
-    - description: The tag of the image to be pushed
+    - default: latest
+      description: The tag of the image to be pushed
       name: IMAGE_TAG
       type: string
-      default: "latest"
-
   results:
-  - name: IMAGE_DIGEST
-    description: Digest of the image just built.
+    - description: Digest of the image just built.
+      name: IMAGE_DIGEST
+      type: string
   steps:
     - args:
         - |-
@@ -101,14 +101,18 @@ spec:
         - '-f'
         - /gen-source/Dockerfile.gen
         - '-t'
-        - $(params.IMAGE_NAME):$(params.IMAGE_TAG)
+        - '$(params.IMAGE_NAME):$(params.IMAGE_TAG)'
         - '-t'
-        - $(params.IMAGE_NAME):latest
+        - '$(params.IMAGE_NAME):latest'
         - .
       image: >-
         registry.redhat.io/rhel8/buildah@sha256:180c4d9849b6ab0e5465d30d4f3a77765cf0d852ca1cb1efb59d6e8c9f90d467
       name: build
       resources: {}
+      securityContext:
+        capabilities:
+          add:
+            - SETFCAP
       volumeMounts:
         - mountPath: /var/lib/containers
           name: varlibcontainers
@@ -120,13 +124,18 @@ spec:
         - push
         - '--storage-driver=vfs'
         - '--tls-verify=$(params.TLSVERIFY)'
-        - --digestfile
+        - '--digestfile'
         - $(workspaces.source.path)/image-digest
-        - $(params.IMAGE_NAME):$(params.IMAGE_TAG)
+        - '$(params.IMAGE_NAME):$(params.IMAGE_TAG)'
         - 'docker://$(params.IMAGE_NAME):$(params.IMAGE_TAG)'
-      image: registry.redhat.io/rhel8/buildah@sha256:180c4d9849b6ab0e5465d30d4f3a77765cf0d852ca1cb1efb59d6e8c9f90d467
+      image: >-
+        registry.redhat.io/rhel8/buildah@sha256:180c4d9849b6ab0e5465d30d4f3a77765cf0d852ca1cb1efb59d6e8c9f90d467
       name: push-tag
       resources: {}
+      securityContext:
+        capabilities:
+          add:
+            - SETFCAP
       volumeMounts:
         - mountPath: /var/lib/containers
           name: varlibcontainers
@@ -135,19 +144,28 @@ spec:
         - push
         - '--storage-driver=vfs'
         - '--tls-verify=$(params.TLSVERIFY)'
-        - --digestfile
+        - '--digestfile'
         - $(workspaces.source.path)/image-digest
-        - $(params.IMAGE_NAME):$(params.IMAGE_TAG)
+        - '$(params.IMAGE_NAME):$(params.IMAGE_TAG)'
         - 'docker://$(params.IMAGE_NAME):latest'
-      image: registry.redhat.io/rhel8/buildah@sha256:180c4d9849b6ab0e5465d30d4f3a77765cf0d852ca1cb1efb59d6e8c9f90d467
+      image: >-
+        registry.redhat.io/rhel8/buildah@sha256:180c4d9849b6ab0e5465d30d4f3a77765cf0d852ca1cb1efb59d6e8c9f90d467
       name: push-latest
       resources: {}
+      securityContext:
+        capabilities:
+          add:
+            - SETFCAP
       volumeMounts:
         - mountPath: /var/lib/containers
           name: varlibcontainers
-    - name: digest-to-results
-      image: registry.redhat.io/rhel8/buildah@sha256:180c4d9849b6ab0e5465d30d4f3a77765cf0d852ca1cb1efb59d6e8c9f90d467
-      script: cat $(workspaces.source.path)/image-digest | tee /tekton/results/IMAGE_DIGEST
+    - image: >-
+        registry.redhat.io/rhel8/buildah@sha256:180c4d9849b6ab0e5465d30d4f3a77765cf0d852ca1cb1efb59d6e8c9f90d467
+      name: digest-to-results
+      resources: {}
+      script: >-
+        cat $(workspaces.source.path)/image-digest | tee
+        /tekton/results/IMAGE_DIGEST
   volumes:
     - emptyDir: {}
       name: varlibcontainers
