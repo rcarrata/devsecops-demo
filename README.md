@@ -217,7 +217,7 @@ cd ..
 ./demo.sh start
 ```
 
-NOTE: This pipeline will fail if you don't [disable the "Fixable at least Important"](docs/disable_policy_enforcement.md) policy enforcement behaviour of ACS. This is expected to demonstrate the failure when a violation of the system policy occurs.
+NOTE: This pipeline will fail if you don't [disable the "Fixable Severity at least Important"](docs/disable_policy_enforcement.md) policy enforcement behaviour of ACS. This is expected to demonstrate the failure when a violation of the system policy occurs. Without disabling this policy (or at least changing the behaviour from "inform and enforce" to just "inform"), the image-check stage of the pipeline will fail (and break the build).
 
 ## Quick Video with the Demo
 
