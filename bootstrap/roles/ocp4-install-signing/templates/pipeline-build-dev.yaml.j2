@@ -4,6 +4,17 @@ metadata:
   name: petclinic-build-dev
   namespace: cicd
 spec:
+  finally:
+    - name: syft-sbom
+      params:
+        - name: APP_PATH
+          value: $(workspaces.source.path)
+      taskRef:
+        kind: Task
+        name: syft-sbom
+      workspaces:
+        - name: source
+          workspace: workspace
   params:
     - name: APP_SOURCE_GIT
       type: string

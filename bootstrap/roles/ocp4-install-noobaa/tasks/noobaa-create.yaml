@@ -114,7 +114,7 @@
   shell: |
     oc get BackingStore/"{{ backing_store_name }}" -n openshift-storage -o jsonpath='{.status.phase}'
   register: backing_store
-  retries: 10
+  retries: 20
   delay: 20
   until:
     - backing_store.stdout == "Ready"

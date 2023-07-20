@@ -1,0 +1,64 @@
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: syft-sbom
+  namespace: cicd
+spec:
+  description: This Task can be used to generate a SBOM file with Syft.
+  params:
+    - default: $(workspaces.source.path)
+      description: Application folder to scan
+      name: APP_PATH
+      type: string
+    - default: reports
+      description: The reports repository username
+      name: REPORTS_REPO_USERNAME
+      type: string
+    - default: reports
+      description: The reports repository password
+      name: REPORTS_REPO_PASSWORD
+      type: string
+    - default: 'http://reports-repo:8080'
+      description: >-
+        The reports repository host based on
+        https://github.com/chmouel/openshift-django-uploader
+      name: REPORTS_REPO_HOST
+      type: string
+  steps:
+    - env:
+        - name: PIPELINERUN_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: 'metadata.labels[''tekton.dev/pipelineRun'']'
+      image: 'registry.access.redhat.com/ubi8/ubi:latest'
+      name: syft-scan
+      resources: {}
+      script: >
+        #!/usr/bin/env bash
+
+        echo '## Getting Syft ##'
+
+        pwd
+
+        curl -sSfL
+        https://raw.githubusercontent.com/anchore/syft/main/install.sh | sh -s
+        -- -b .
+
+        chmod +x ./syft
+
+        echo '## Scanning folder and generating SBOM ##'
+
+        ./syft $(params.APP_PATH) -o spdx-json=sbom.json
+
+        echo '## SBOM content ##'
+
+        cat ./sbom.json
+
+        echo "Uploading the report into the report server"
+
+        curl -u $(params.REPORTS_REPO_USERNAME):$(params.REPORTS_REPO_PASSWORD)
+        -F path=$PIPELINERUN_NAME/$'PIPELINERUN_NAME'-sbom.json -F file=@sbom.json -X
+        POST $(params.REPORTS_REPO_HOST)/upload; echo ""
+  workspaces:
+    - description: The workspace consisting of maven project.
+      name: source

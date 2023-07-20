@@ -14,6 +14,7 @@
   - ./templates/task-rox-image-check.yaml.j2
   - ./templates/task-s2i-java-11.yaml.j2
   - ./templates/task-zap-proxy.yaml.j2
+  - ./templates/task-syft-sbom.yaml.j2
 
 - name: Create OpenShift Objects for Openshift Pipeline Triggers
   k8s:
