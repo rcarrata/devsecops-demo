@@ -54,10 +54,14 @@ spec:
 
         cat ./sbom.json
 
+        cp ./sbom.json /workspace/source/.
+
+        chmod 0666 /workspace/source/sbom.json
+
         echo "Uploading the report into the report server"
 
         curl -u $(params.REPORTS_REPO_USERNAME):$(params.REPORTS_REPO_PASSWORD)
-        -F path=$PIPELINERUN_NAME/$'PIPELINERUN_NAME'-sbom.json -F file=@sbom.json -X
+        -F path=$PIPELINERUN_NAME/$PIPELINERUN_NAME-sbom.json -F file=@sbom.json -X
         POST $(params.REPORTS_REPO_HOST)/upload; echo ""
   workspaces:
     - description: The workspace consisting of maven project.

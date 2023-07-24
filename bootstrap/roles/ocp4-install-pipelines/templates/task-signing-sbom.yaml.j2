@@ -1,0 +1,54 @@
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: cosign-sign-sbom
+  namespace: cicd
+spec:
+  description: This Task can be used to sign an image in a registry
+  params:
+    - description: Image to be signed
+      name: SIGNATURE_IMAGE
+      type: string
+    - description: Name (reference) of the cosign image
+      name: IMAGE
+      type: string
+    - description: SBOM to be signed
+      name: SIGNATURE_SBOM
+      type: string
+    - default: []
+      description: args to pass to cosign command to
+      name: ARGS
+      type: array
+  steps:
+    - args:
+        - $(params.ARGS)
+      env:
+        - name: PIPELINERUN_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: 'metadata.labels[''tekton.dev/pipelineRun'']'
+      image: $(params.IMAGE)
+      name: cosign-actions
+      resources: {}
+      script: |
+        #!/usr/bin/env bash 
+
+        verify="cosign verify --allow-insecure-registry --key k8s://cicd/signing-secrets $(params.SIGNATURE_IMAGE)" 
+        signing="cosign sign --allow-insecure-registry --key k8s://cicd/signing-secrets --attachment sbom $(params.SIGNATURE_IMAGE)"
+        $verify
+        attach="cosign $* $(params.SIGNATURE_SBOM) $(params.SIGNATURE_IMAGE) --sbom=none"
+        attest="cosign attest --predicate $(params.SIGNATURE_SBOM) --key k8s://cicd/signing-secrets --allow-insecure-registry $(params.SIGNATURE_IMAGE)"
+        tree="cosign tree --allow-insecure-registry $(params.SIGNATURE_IMAGE)"
+        echo "This is the command we will run $attach"
+        $attach
+        echo "Starting Image Signing Task"
+        echo "This is the command we will run $signing"
+        $signing
+        echo "This is the command we will run $attest"
+        $attest
+        echo "This will run the cosign tree command to see what is attached to signed image"
+        $tree
+      workingDir: $(workspaces.source.path)
+  workspaces:
+    - description: The workspace consisting of maven project.
+      name: source
