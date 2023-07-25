@@ -19,12 +19,12 @@ spec:
     dockerStrategy:
       from:
         kind: ImageStreamTag
-        name: 'ubi:8.0'
+        name: 'ubi:8.8'
   postCommit: {}
   source:
     type: Dockerfile
     dockerfile: >-
-      FROM registry.redhat.io/ubi8/ubi:8.0
+      FROM registry.redhat.io/ubi8/ubi:8.8
 
 
       RUN yum install go git wget tar rsync -y && wget
