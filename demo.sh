@@ -135,6 +135,8 @@ command.sign-verify() {
     oc exec pod/"$cosign_pod" -n $working_namespace -- /bin/bash -c "chmod ugo+x /workdir/verify/${verify_script}"
     oc exec pod/"$cosign_pod" -n $working_namespace -- /bin/bash -c "/workdir/verify/${verify_script} $working_namespace "
 
+    info "## Verifying image, SBOM, and attestation ##"
+    taskrun=$(oc get taskruns -n cicd | grep sign-sbom | awk '{print$1}'); oc logs $taskrun-pod -n $working_namespace
     # echo "Obtaining cosign.key"
     # oc exec pod/"$cosign_pod" -n openshift-pipelines -- /bin/bash -c "oc get secret/signing-secrets -n openshift-pipelines -o jsonpath='{.data.cosign\.key}' | base64 -d > /test/cosign.key"
     # echo "Obtaining cosign.password"

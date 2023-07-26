@@ -7,10 +7,10 @@
   - ./templates/cosign-is.yaml.j2
   - ./templates/cosign-build.yaml.j2
 
-- name: restarting the build if failed
-  shell: |
-     oc start-build cosign-pod -n "{{ pipeline_namespace }}"
-  register: build
+# - name: restarting the build if failed
+#   shell: |
+#      oc start-build cosign-pod -n "{{ pipeline_namespace }}"
+#   register: build
  
 - name: Wait Until cosign build is complete
   shell: |
