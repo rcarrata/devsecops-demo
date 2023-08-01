@@ -181,6 +181,13 @@ Install some extra Python dependency:
 pip3 install jmespath
 ```
 
+* On Fedora workstations/servers, these prequisities can be fulfilled with the following single command:
+
+```sh
+sudo dnf install -y git ansible ansible-collection-kubernetes-core python3-kubernetes python3-openshift python3-jmespath jq
+```
+
+
 ## Bootstrap
 
 Fully automated deployment and integration of every resource and tool needed for this demo.
@@ -217,7 +224,7 @@ cd ..
 ./demo.sh start
 ```
 
-NOTE: This pipeline will fail if you don't [disable the "Fixable at least Important"](docs/disable_policy_enforcement.md) policy enforcement behaviour of ACS. This is expected to demonstrate the failure when a violation of the system policy occurs.
+NOTE: This pipeline will fail if you don't [disable the "Fixable Severity at least Important"](docs/disable_policy_enforcement.md) policy enforcement behaviour of ACS. This is expected to demonstrate the failure when a violation of the system policy occurs. Without disabling this policy (or at least changing the behaviour from "inform and enforce" to just "inform"), the image-check stage of the pipeline will fail (and break the build).
 
 ## Quick Video with the Demo
 
