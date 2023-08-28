@@ -245,4 +245,4 @@ NOTE: This pipeline will fail if you don't [disable the "Fixable Severity at lea
 
 # Credits
 
-Big thanks for the [contributors](https://github.com/rcarrata/devsecops-demo/graphs/contributors) and reviews that helped so much in this demo! We grow as we share!
+Big thanks for the [contributors](https://github.com/afouladi7/devsecops-demo/graphs/contributors) and reviews that helped so much in this demo! We grow as we share!
