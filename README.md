@@ -7,7 +7,7 @@ DevSecOps CICD pipeline demo using several technologies such as:
 - [OpenShift Pipelines](https://www.openshift.com/learn/topics/ci-cd)
 - [OpenShift GitOps](https://www.openshift.com/blog/announcing-openshift-gitops)
 - [OpenShift Advanced Cluster Security for Kubernetes](https://www.redhat.com/en/resources/advanced-cluster-security-for-kubernetes-datasheet)
-- [OpenShift Container Registry](https://docs.openshift.com/container-platform/latest/registry/architecture-component-imageregistry.html)
+- [Red Hat Quay](https://www.redhat.com/en/resources/quay-datasheet)
 
 Vulnerability and configuration management methods included in this demo are the following:
 
@@ -41,7 +41,7 @@ On every push to the spring-petclinic git repository on Gogs git server, the fol
 1. [Dependency report](docs/Steps.md#dependency-report) from the source code is generated and uploaded to the report server repository.
 2. [Unit tests](docs/Steps.md#unit-tests) are executed and in parallel the code is [analyzed by Sonarqube](docs/Steps.md#code-analysis-sonarqube) for anti-patterns.
 3. Application is packaged as a JAR and [released to Sonatype Nexus](docs/Steps.md#release-app) snapshot repository
-4. A [container image is built](docs/Steps.md#build-image) in DEV environment using S2I, and pushed to OpenShift internal registry, and tagged with spring-petclinic:[branch]-[commit-sha] and spring-petclinic:latest
+4. A [container image is built](docs/Steps.md#build-image) in DEV environment using S2I and pushed to local instance of Red Hat Quay tagged with spring-petclinic:[branch]-[commit-sha] and spring-petclinic:latest
 
 ## 2. DevSecOps steps using Advanced Cluster Security for Kubernetes
 

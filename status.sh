@@ -27,3 +27,8 @@ printf "\n## ArgoCD Server - Username/Password: admin/[DEX] ##\n"
 ARGO=$(oc get route -n openshift-gitops openshift-gitops-server -o jsonpath='{.spec.host}')
 printf "https://$ARGO"
 printf "\n"
+
+printf "\n## Quay Server - Username/Password: quayadmin/quaypass123 ##\n"
+QUAY=$(oc get route -n quay-demo demo-registry-quay -o jsonpath='{.spec.host}')
+printf "https://$QUAY"
+printf "\n"
