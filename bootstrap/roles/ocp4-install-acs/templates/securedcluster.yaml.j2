@@ -5,23 +5,10 @@ metadata:
   name: stackrox-secured-cluster-services
 spec:
   clusterName: development
-  auditLogs:
-    collection: Auto
   admissionControl:
-    listenOnUpdates: true
-    bypass: BreakGlassAnnotation
-    contactImageScanners: DoNotScanInline
-    listenOnCreates: true
-    timeoutSeconds: 20
+    listenOnCreates: false
     listenOnEvents: true
-  scanner:
-    analyzer:
-      scaling:
-        autoScaling: Enabled
-        maxReplicas: 5
-        minReplicas: 2
-        replicas: 3
-    scannerComponent: AutoSense
+    listenOnUpdates: false
   perNode:
     collector:
       collection: EBPF
