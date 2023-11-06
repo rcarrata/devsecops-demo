@@ -179,7 +179,15 @@ metadata:
   namespace: cicd
 spec:
   to:
+    kind: Service
     name: gogs
+    weight: 100
+  port:
+    targetPort: 3000-tcp
+  tls:
+    termination: edge
+    insecureEdgeTerminationPolicy: Redirect
+  wildcardPolicy: None
 ---
 kind: PersistentVolumeClaim
 apiVersion: v1
