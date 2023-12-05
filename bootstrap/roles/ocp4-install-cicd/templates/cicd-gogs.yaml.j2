@@ -184,6 +184,9 @@ spec:
     weight: 100
   port:
     targetPort: 3000-tcp
+  tls:
+    termination: edge
+    insecureEdgeTerminationPolicy: None
   wildcardPolicy: None
 ---
 kind: PersistentVolumeClaim
