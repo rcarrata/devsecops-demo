@@ -67,7 +67,7 @@ spec:
         # git commit -m "[$(context.pipelineRun.name)] Image digest updated"
         git commit -m "[ci] Image digest updated"
 
-        git remote add auth-origin $(echo $(params.GIT_REPOSITORY) | sed -E "s#http://(.*)#http://$(params.GIT_USERNAME):$(params.GIT_PASSWORD)@\1#g")
+        git remote add auth-origin $(echo $(params.GIT_REPOSITORY) | sed -E "s#https://(.*)#https://$(params.GIT_USERNAME):$(params.GIT_PASSWORD)@\1#g")
         git push auth-origin master
 
         RESULT_SHA="$(git rev-parse HEAD | tr -d '\n')"
