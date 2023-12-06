@@ -5,7 +5,7 @@ metadata:
   namespace: cicd
 spec:
   params:
-    - default: http://{{ r_gogs_route.resources[0].spec.host }}/gogs/spring-petclinic
+    - default: https://{{ r_gogs_route.resources[0].spec.host }}/gogs/spring-petclinic
       description: The application git repository
       name: APP_SOURCE_GIT
       type: string
@@ -13,7 +13,7 @@ spec:
       description: The application git revision
       name: APP_SOURCE_REVISION
       type: string
-    - default: http://{{ r_gogs_route.resources[0].spec.host }}/gogs/spring-petclinic-config
+    - default: https://{{ r_gogs_route.resources[0].spec.host }}/gogs/spring-petclinic-config
       description: The application manifests git repository
       name: APP_MANIFESTS_GIT
       type: string

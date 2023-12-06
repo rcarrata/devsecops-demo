@@ -8,7 +8,7 @@ spec:
     - name: APP_SOURCE_GIT
       type: string
       description: The application git repository
-      default: http://{{ r_gogs_route.resources[0].spec.host }}/gogs/spring-petclinic
+      default: https://{{ r_gogs_route.resources[0].spec.host }}/gogs/spring-petclinic
     - name: APP_SOURCE_REVISION
       type: string
       description: The application git revision
@@ -16,7 +16,7 @@ spec:
     - name: APP_MANIFESTS_GIT
       type: string
       description: The application manifests git repository
-      default: http://{{ r_gogs_route.resources[0].spec.host }}/gogs/spring-petclinic-config
+      default: https://{{ r_gogs_route.resources[0].spec.host }}/gogs/spring-petclinic-config
     - name: APP_IMAGE_TAG
       type: string
       default: latest
